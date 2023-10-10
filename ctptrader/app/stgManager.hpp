@@ -7,6 +7,8 @@
 #include <base/stg.hpp>
 #include <util/channel.hpp>
 
+#include <service/dataService.hpp>
+
 namespace ctptrader::app {
 
 class StgInstance {

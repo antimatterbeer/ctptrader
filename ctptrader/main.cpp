@@ -24,23 +24,22 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   auto config = res.as_table();
-  auto data_folder = (*config)["data_folder"].value<std::string>();
-  if (!data_folder.has_value()) {
-    std::cout << "Error: data_folder is not specified" << std::endl;
-    return 1;
+  auto data_folder = (*config)["data_folder"].value_or<std::string>("");
+  auto market_channel = (*config)["market_channel"].value_or<std::string>("");
+  if (data_folder.empty() || market_channel.empty()) {
+    std::cerr << "Error: data_folder or market_channel is not specified"
+              << std::endl;
   }
-
+  DataService().Init(data_folder);
   auto pid = fork();
   if (pid == 0) {
-    DataService().Init(data_folder.value());
-    app::StgManager sm("shm_ctptrader_md");
-    sm.Init(*config);
+    app::StgManager sm(market_channel);
+    sm.Init(*(*config)["stgManager"].as_table());
     sm.Start();
     return 0;
   } else {
-    DataService().Init(data_folder.value());
-    app::CtpMG mg("shm_ctptrader_md");
-    mg.Init(*config);
+    app::CtpMG mg(market_channel);
+    mg.Init(*(*config)["ctpMG"].as_table());
     mg.Start();
   }
   return 0;
