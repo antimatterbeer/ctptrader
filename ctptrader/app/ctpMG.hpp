@@ -16,10 +16,13 @@ class Spi : public CThostFtdcMdSpi {
 public:
   Spi(CThostFtdcMdApi *api, const std::string &&broker_id,
       const std::string &&user_id, const std::string &&password,
-      std::string_view shm_addr, std::vector<std::string> instruments)
+      std::string_view shm_addr, std::vector<std::string> &instruments)
       : api_(api), broker_id_(std::move(broker_id)),
         user_id_(std::move(user_id)), password_(std::move(password)),
-        instruments_(std::move(instruments)), tx_(shm_addr) {}
+        instruments_(std::move(instruments)), tx_(shm_addr) {
+    LOG_INFO("[CtpMG]instruments: {}", instruments_.size());
+  }
+
   ~Spi() {}
 
   void OnFrontConnected() override;
@@ -66,36 +69,37 @@ private:
 class CtpMG {
 public:
   CtpMG(std::string_view channel) : channel_(channel) {}
+
   ~CtpMG() {}
 
   bool Init(const toml::table &config) {
+    LOG_INFO("[CtpMG]Init");
     broker_id_ = config["broker_id"].value_or<std::string>("");
     user_id_ = config["user_id"].value_or<std::string>("");
     password_ = config["password"].value_or<std::string>("");
     auto market_front = config["market_front"].value_or<std::string>("");
     auto instruments = config["instruments"].as_array();
-    std::vector<std::string> ins;
-    for (auto &&ele : *instruments) {
-      auto v = ele.value<std::string>();
-      if (v.has_value()) {
-        ins.emplace_back(v.value());
-      }
-    }
     if (broker_id_.empty() || user_id_.empty() || password_.empty() ||
-        market_front.empty() || ins.empty()) {
+        market_front.empty() || instruments->empty()) {
       std::cerr << "Error: broker_id, user_id, password, market_front, "
                    "instruments must be specified"
                 << std::endl;
       return false;
     }
     front_address_ = fmt::format("tcp://{}", market_front);
+    for (auto &&ele : *instruments) {
+      auto v = ele.value<std::string>();
+      if (v.has_value()) {
+        instruments_.emplace_back(v.value());
+      }
+    }
     return true;
   }
 
   void Start() {
     auto *api = CThostFtdcMdApi::CreateFtdcMdApi();
     Spi spi(api, std::move(broker_id_), std::move(user_id_),
-            std::move(password_), channel_, std::move(instruments_));
+            std::move(password_), channel_, instruments_);
     api->RegisterSpi(&spi);
     api->RegisterFront((char *)front_address_.c_str());
     api->Init();

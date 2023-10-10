@@ -35,6 +35,7 @@ void Spi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
     std::vector<char *> instruments;
     for (auto &i : instruments_) {
       instruments.emplace_back(const_cast<char *>(i.c_str()));
+      SPDLOG_INFO("[CtpMG]Subscribe market data. InstrumentID = {}", i);
     }
     int res = api_->SubscribeMarketData(instruments.data(), instruments.size());
     if (res == 0) {
@@ -112,4 +113,4 @@ void Spi::OnRtnDepthMarketData(
 
 void Spi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp) {}
 
-} // namespace ctptrader::ctpMG
+} // namespace ctptrader::app

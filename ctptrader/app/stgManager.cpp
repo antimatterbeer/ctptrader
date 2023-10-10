@@ -23,14 +23,15 @@ bool StgInstance::Load(std::string_view libpath) {
 }
 
 bool StgManager::Init(const toml::table &config) {
-  auto stgs = config["stgManager"]["stg"].as_array();
+  LOG_INFO("[StgManager]Init");
+  auto stgs = config["stg"].as_array();
   for (const auto &e : *stgs) {
     auto stg_config = e.as_table();
     auto name = (*stg_config)["name"].value<std::string>();
     auto libpath = (*stg_config)["libpath"].value<std::string>();
     StgInstance stg;
     if (stg.Load(libpath.value()) && stg.Init(*stg_config)) {
-      stgs_.push_back(std::move(stg));
+      stgs_.emplace_back(std::move(stg));
     }
   }
   return true;
