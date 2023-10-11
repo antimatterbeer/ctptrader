@@ -22,7 +22,7 @@ public:
     char buf[32];
     struct tm t;
     localtime_r(&tv_sec, &t);
-    sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d.%03ld", t.tm_year + 1900,
+    sprintf(buf, "%04d%02d%02d %02d:%02d:%02d.%03ld", t.tm_year + 1900,
             t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,
             tv_nsec / NANOSINMILLI);
     return buf;
@@ -152,7 +152,7 @@ public:
   static Timestamp FromString(std::string_view s) {
     struct tm tm;
     memset(&tm, 0, sizeof(tm));
-    strptime(s.data(), "%Y-%m-%d %H:%M:%S", &tm);
+    strptime(s.data(), "%Y%m%d %H:%M:%S", &tm);
     return Timestamp::FromSeconds(mktime(&tm));
   }
 } __attribute__((packed));

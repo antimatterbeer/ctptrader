@@ -69,7 +69,8 @@ public:
     return ds;
   }
 
-  DataService() : logger_(spdlog::default_logger()) {}
+  DataService()
+      : logger_(spdlog::default_logger()) {}
   ~DataService() = default;
 
   bool Init(std::string_view folder);

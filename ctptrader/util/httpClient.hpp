@@ -79,7 +79,8 @@ struct HttpRequest {
 
 class HttpClient {
 public:
-  HttpClient() : curl_(curl_easy_init()) {}
+  HttpClient()
+      : curl_(curl_easy_init()) {}
   ~HttpClient() { curl_easy_cleanup(curl_); }
 
   HttpRequest Request() {

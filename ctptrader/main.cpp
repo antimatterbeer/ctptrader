@@ -1,5 +1,4 @@
 #include <unistd.h>
-
 #include <variant>
 
 #include <toml.hpp>
