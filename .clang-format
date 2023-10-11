@@ -1,1 +1,3 @@
 basedOnStyle: LLVM
+BreakConstructorInitializersBeforeComma: false
+BreakConstructorInitializers: BeforeComma

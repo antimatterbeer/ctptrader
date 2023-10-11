@@ -35,7 +35,7 @@ void Spi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
     std::vector<char *> instruments;
     for (auto &i : instruments_) {
       instruments.emplace_back(const_cast<char *>(i.c_str()));
-      SPDLOG_INFO("[CtpMG]Subscribe market data. InstrumentID = {}", i);
+      LOG_INFO("[CtpMG]Subscribe market data. InstrumentID = {}", i);
     }
     int res = api_->SubscribeMarketData(instruments.data(), instruments.size());
     if (res == 0) {
@@ -91,26 +91,76 @@ void Spi::OnRspUnSubForQuoteRsp(
 
 void Spi::OnRtnDepthMarketData(
     CThostFtdcDepthMarketDataField *pDepthMarketData) {
-  base::Depth d;
-  memset(&d, 0, sizeof(d));
+  base::Depth depth;
   std::string instrument_id(pDepthMarketData->InstrumentID);
-  d.update_time_ = base::Timestamp::FromString(fmt::format(
+  depth.update_time_ = base::Timestamp::FromString(fmt::format(
       "{} {}", pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime));
-  d.instrument_id_ = InstrumentCenter().GetID(instrument_id);
-  d.open_ = pDepthMarketData->OpenPrice;
-  d.high_ = pDepthMarketData->HighestPrice;
-  d.low_ = pDepthMarketData->LowestPrice;
-  d.last_ = pDepthMarketData->LastPrice;
-  d.open_interest_ = pDepthMarketData->OpenInterest;
-  d.volume_ = pDepthMarketData->Volume;
-  d.turnover_ = pDepthMarketData->Turnover;
-  d.ask_price_[0] = pDepthMarketData->AskPrice1;
-  d.bid_price_[0] = pDepthMarketData->BidPrice1;
-  d.ask_volume_[0] = pDepthMarketData->AskVolume1;
-  d.bid_volume_[0] = pDepthMarketData->BidVolume1;
-  tx_.Write(d);
+  depth.instrument_id_ = InstrumentCenter().GetID(instrument_id);
+  depth.open_ = pDepthMarketData->OpenPrice;
+  depth.high_ = pDepthMarketData->HighestPrice;
+  depth.low_ = pDepthMarketData->LowestPrice;
+  depth.last_ = pDepthMarketData->LastPrice;
+  depth.open_interest_ = pDepthMarketData->OpenInterest;
+  depth.volume_ = pDepthMarketData->Volume;
+  depth.turnover_ = pDepthMarketData->Turnover;
+  depth.ask_price_[0] = pDepthMarketData->AskPrice1;
+  depth.bid_price_[0] = pDepthMarketData->BidPrice1;
+  depth.ask_volume_[0] = pDepthMarketData->AskVolume1;
+  depth.bid_volume_[0] = pDepthMarketData->BidVolume1;
+  if (!received_[depth.instrument_id_]) [[unlikely]] {
+    base::Static st;
+    st.instrument_id_ = depth.instrument_id_;
+    st.prev_close_ = pDepthMarketData->PreClosePrice;
+    st.upper_limit_ = pDepthMarketData->UpperLimitPrice;
+    st.lower_limit_ = pDepthMarketData->LowerLimitPrice;
+    st.trading_day_ = base::Date(std::atoi(pDepthMarketData->TradingDay));
+    if (!tx_.Write(st)) {
+      LOG_ERROR("[CtpMG]Write to channel failed");
+    }
+  }
+  if (!tx_.Write(depth)) {
+    LOG_ERROR("[CtpMG]Write to channel failed");
+  }
 }
 
-void Spi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp) {}
+void Spi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp) {
+  LOG_INFO("[CtpMG]Quote received. InstrumentID = {}",
+           pForQuoteRsp->InstrumentID);
+}
+
+bool CtpMG::Init(const toml::table &config) {
+  LOG_INFO("[CtpMG]Init");
+  broker_id_ = config["broker_id"].value_or<std::string>("");
+  user_id_ = config["user_id"].value_or<std::string>("");
+  password_ = config["password"].value_or<std::string>("");
+  auto market_front = config["market_front"].value_or<std::string>("");
+  auto instruments = config["instruments"].as_array();
+  if (broker_id_.empty() || user_id_.empty() || password_.empty() ||
+      market_front.empty() || instruments->empty()) {
+    std::cerr << "Error: broker_id, user_id, password, market_front, "
+                 "instruments must be specified"
+              << std::endl;
+    return false;
+  }
+  front_address_ = fmt::format("tcp://{}", market_front);
+  for (auto &&ele : *instruments) {
+    auto v = ele.value<std::string>();
+    if (v.has_value()) {
+      instruments_.emplace_back(v.value());
+    }
+  }
+  return true;
+}
+
+void CtpMG::Start() {
+  auto *api = CThostFtdcMdApi::CreateFtdcMdApi();
+  Spi spi(api, std::move(broker_id_), std::move(user_id_), std::move(password_),
+          channel_, instruments_);
+  api->RegisterSpi(&spi);
+  api->RegisterFront((char *)front_address_.c_str());
+  api->Init();
+  api->Join();
+  api->Release();
+}
 
 } // namespace ctptrader::app

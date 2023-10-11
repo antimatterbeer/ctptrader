@@ -22,15 +22,6 @@ public:
   virtual void OnStatic(const Static &st) {}
   virtual void OnDepth(const Depth &depth) {}
   virtual void OnEndOfDay(const Date &Date) {}
-
-  void ResetInterest(int size) { interests_.assign(size, false); }
-
-  void SetInterest(ID instrument_id) { interests_[instrument_id] = true; }
-
-  bool IsInterested(ID instrument_id) { return interests_[instrument_id]; }
-
-private:
-  std::vector<bool> interests_;
 };
 
 } // namespace ctptrader::base

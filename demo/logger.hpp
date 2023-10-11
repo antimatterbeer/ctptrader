@@ -33,7 +33,7 @@ public:
     LOG_INFO("[Logger]OnDepth. instrument_id: {} update_time: {}",
              depth.instrument_id_, depth.update_time_.ToString());
   }
-  
+
   void OnEndOfDay(const base::Date &Date) override {
     LOG_INFO("[Logger]OnEndOfDay. date: {}", Date.ToString());
   }

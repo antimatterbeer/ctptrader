@@ -1,25 +1,25 @@
+#include "stgManager.hpp"
 #include <app/stgManager.hpp>
 
 namespace ctptrader::app {
 
-bool StgInstance::Load(std::string_view libpath) {
+StgInstance::StgInstance(std::string_view libpath) {
   handle_ = dlopen(libpath.data(), RTLD_NOW | RTLD_NODELETE);
   if (!handle_) {
     std::cerr << dlerror() << std::endl;
-    return false;
+    return;
   }
   creator_ = reinterpret_cast<base::Stg::Creator>(dlsym(handle_, "creator"));
   if (!creator_) {
     std::cerr << dlerror() << std::endl;
-    return false;
+    return;
   }
   deleter_ = reinterpret_cast<base::Stg::Deleter>(dlsym(handle_, "deleter"));
   if (!deleter_) {
     std::cerr << dlerror() << std::endl;
-    return false;
+    return;
   }
   stg_ = creator_();
-  return true;
 }
 
 bool StgManager::Init(const toml::table &config) {
@@ -29,11 +29,9 @@ bool StgManager::Init(const toml::table &config) {
     auto stg_config = e.as_table();
     auto name = (*stg_config)["name"].value<std::string>();
     auto libpath = (*stg_config)["libpath"].value<std::string>();
-    StgInstance stg;
-    if (stg.Load(libpath.value()) && stg.Init(*stg_config)) {
-      stgs_.emplace_back(std::move(stg));
-    }
+    stgs_.emplace_back(libpath.value());
   }
+  LOG_INFO("[StgManager]Add {} stgs", stgs_.size());
   return true;
 }
 
@@ -41,7 +39,8 @@ void StgManager::Start() {
   base::Msg msg;
   while (true) {
     if (rx_.Read(msg)) {
-      std::visit(*this, msg);
+      LOG_INFO("[StgManager]Read from channel");
+      OnMsg(msg);
     }
   }
 }

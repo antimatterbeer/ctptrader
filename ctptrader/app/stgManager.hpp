@@ -13,12 +13,14 @@ namespace ctptrader::app {
 
 class StgInstance {
 public:
+  StgInstance(std::string_view libpath);
+
   ~StgInstance() {
-    if (handle_) {
-      dlclose(handle_);
-    }
     if (stg_) {
       deleter_(stg_);
+    }
+    if (handle_) {
+      dlclose(handle_);
     }
   }
   bool Load(std::string_view libpath);
@@ -28,53 +30,50 @@ public:
   void OnStatic(const base::Static &st) { stg_->OnStatic(st); }
   void OnDepth(const base::Depth &depth) { stg_->OnDepth(depth); }
   void OnEndOfDay(const base::Date &Date) { stg_->OnEndOfDay(Date); }
-  bool IsInterested(base::ID instrument_id) {
-    return stg_->IsInterested(instrument_id);
-  }
 
 private:
-  void *handle_;
-  base::Stg::Ptr stg_;
-  base::Stg::Creator creator_;
-  base::Stg::Deleter deleter_;
+  void *handle_{};
+  base::Stg::Ptr stg_{};
+  base::Stg::Creator creator_{};
+  base::Stg::Deleter deleter_{};
 };
 
 class StgManager : public base::NonCopyable {
 public:
-  StgManager(std::string_view market_channel) : rx_(market_channel) {}
+  StgManager(std::string_view market_channel)
+      : rx_(market_channel) {}
   ~StgManager() = default;
 
   bool Init(const toml::table &config);
 
   void Start();
 
+  void OnMsg(const base::Msg &msg) { std::visit(*this, msg); }
+
   void operator()(const base::Bar &bar) {
+    LOG_INFO("[StgManager]OnBar. instrument_id: {}", bar.instrument_id_);
     for (auto &stg : stgs_) {
-      if (stg.IsInterested(bar.instrument_id_)) {
-        stg.OnBar(bar);
-      }
+      stg.OnBar(bar);
     }
   }
 
   void operator()(const base::Static &st) {
+    LOG_INFO("[StgManager]OnStatic. instrument_id: {}", st.instrument_id_);
     for (auto &stg : stgs_) {
-      if (stg.IsInterested(st.instrument_id_)) {
-        stg.OnStatic(st);
-      }
+      stg.OnStatic(st);
     }
   }
 
   void operator()(const base::Depth &depth) {
+    LOG_INFO("[StgManager]OnDepth. instrument_id: {}", depth.instrument_id_);
     for (auto &stg : stgs_) {
-      if (stg.IsInterested(depth.instrument_id_)) {
-        stg.OnDepth(depth);
-      }
+      stg.OnDepth(depth);
     }
   }
 
 private:
   std::vector<StgInstance> stgs_;
-  util::ShmSpscReader<base::Msg, 1024> rx_;
+  util::MsgReceiver rx_;
 };
 
 } // namespace ctptrader::app

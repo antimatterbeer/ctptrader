@@ -28,7 +28,6 @@ include_directories(${THIRDPARTY}/ctp/include)
 include_directories(ctptrader)
 add_subdirectory(ctptrader)
 
-
 if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(test)

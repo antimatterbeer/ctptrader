@@ -7,9 +7,13 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 
+#include <base/msg.hpp>
+
 namespace ctptrader::util {
 
 namespace bip = boost::interprocess;
+
+const size_t BUFFER_SIZE = 256;
 
 template <typename T, size_t Size> class ShmSpscQueue {
   using QueueType =
@@ -19,9 +23,10 @@ template <typename T, size_t Size> class ShmSpscQueue {
 
 public:
   ShmSpscQueue(std::string_view name, size_t size, bool readonly)
-      : name_(name), segment_(CreateSegment(name, size, readonly)),
-        allocator_(segment_->get_segment_manager()),
-        queue_(segment_->find_or_construct<QueueType>("queue")()) {}
+      : name_(name)
+      , segment_(CreateSegment(name, size, readonly))
+      , allocator_(segment_->get_segment_manager())
+      , queue_(segment_->find_or_construct<QueueType>("queue")()) {}
   ~ShmSpscQueue() { bip::shared_memory_object::remove(name_.c_str()); }
 
 private:
@@ -60,5 +65,9 @@ public:
   bool Write(const T &value) { return this->queue_->push(value); }
   bool Full() const { return this->queue_->full(); }
 };
+
+using MsgSender = ShmSpscWriter<base::Msg, BUFFER_SIZE>;
+
+using MsgReceiver = ShmSpscReader<base::Msg, BUFFER_SIZE>;
 
 } // namespace ctptrader::util
