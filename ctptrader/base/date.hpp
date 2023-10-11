@@ -19,9 +19,12 @@ enum DayOfWeek : int {
 /// @brief Date class
 class Date {
 public:
-  Date() : yyyymmdd_(0) {}
-  Date(int64_t yyyymmdd) : yyyymmdd_(yyyymmdd) {}
-  Date(const Date &date) : yyyymmdd_(date.yyyymmdd_) {}
+  Date()
+      : yyyymmdd_(0) {}
+  Date(int64_t yyyymmdd)
+      : yyyymmdd_(yyyymmdd) {}
+  Date(const Date &date)
+      : yyyymmdd_(date.yyyymmdd_) {}
   std::string ToString() const { return std::to_string(yyyymmdd_); }
   int AsInt() const { return yyyymmdd_; }
   int Year() const { return yyyymmdd_ / 10000; }

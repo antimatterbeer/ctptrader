@@ -36,7 +36,6 @@ int main(int argc, char *argv[]) {
     app::StgManager sm(market_channel);
     sm.Init(*(*config)["stgManager"].as_table());
     sm.Start();
-    return 0;
   } else {
     app::CtpMG mg(market_channel);
     mg.Init(*(*config)["ctpMG"].as_table());
