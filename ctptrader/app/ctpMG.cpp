@@ -91,6 +91,8 @@ void Spi::OnRspUnSubForQuoteRsp(
 
 void Spi::OnRtnDepthMarketData(
     CThostFtdcDepthMarketDataField *pDepthMarketData) {
+  fmt::println("{} {}", pDepthMarketData->ActionDay,
+               pDepthMarketData->UpdateTime);
   base::Depth depth;
   std::string instrument_id(pDepthMarketData->InstrumentID);
   depth.update_time_ = base::Timestamp::FromString(fmt::format(
@@ -107,6 +109,8 @@ void Spi::OnRtnDepthMarketData(
   depth.bid_price_[0] = pDepthMarketData->BidPrice1;
   depth.ask_volume_[0] = pDepthMarketData->AskVolume1;
   depth.bid_volume_[0] = pDepthMarketData->BidVolume1;
+  depth.update_time_ = base::Timestamp::FromString(fmt::format(
+      "{} {}", pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime));
   if (!received_[depth.instrument_id_]) [[unlikely]] {
     base::Static st;
     st.instrument_id_ = depth.instrument_id_;

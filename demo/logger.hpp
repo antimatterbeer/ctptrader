@@ -30,8 +30,8 @@ public:
   }
 
   void OnDepth(const base::Depth &depth) override {
-    LOG_INFO("[Logger]OnDepth. instrument_id: {} update_time: {}",
-             depth.instrument_id_, depth.update_time_.ToString());
+    LOG_INFO("[Logger]OnDepth. instrument_id: {} update_time: {}, last: {}",
+             depth.instrument_id_, depth.update_time_.ToString(), depth.last_);
   }
 
   void OnEndOfDay(const base::Date &Date) override {

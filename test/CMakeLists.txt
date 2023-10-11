@@ -10,3 +10,13 @@ target_link_libraries(serviceTest PRIVATE
 )
 
 add_test(NAME serviceTest COMMAND serviceTest)
+
+add_executable(timestampTest timestampTest.cpp)
+
+target_link_libraries(timestampTest PRIVATE
+    baseLib
+    gtest
+    gtest_main
+)
+
+add_test(NAME timestampTest COMMAND timestampTest)
