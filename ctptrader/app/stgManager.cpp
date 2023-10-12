@@ -1,26 +1,6 @@
-#include "stgManager.hpp"
 #include <app/stgManager.hpp>
 
 namespace ctptrader::app {
-
-StgInstance::StgInstance(std::string_view libpath) {
-  handle_ = dlopen(libpath.data(), RTLD_NOW | RTLD_NODELETE);
-  if (!handle_) {
-    std::cerr << dlerror() << std::endl;
-    return;
-  }
-  creator_ = reinterpret_cast<base::Stg::Creator>(dlsym(handle_, "creator"));
-  if (!creator_) {
-    std::cerr << dlerror() << std::endl;
-    return;
-  }
-  deleter_ = reinterpret_cast<base::Stg::Deleter>(dlsym(handle_, "deleter"));
-  if (!deleter_) {
-    std::cerr << dlerror() << std::endl;
-    return;
-  }
-  stg_ = creator_();
-}
 
 bool StgManager::Init(const toml::table &config) {
   LOG_INFO("[StgManager]Init");
@@ -29,7 +9,7 @@ bool StgManager::Init(const toml::table &config) {
     auto stg_config = e.as_table();
     auto name = (*stg_config)["name"].value<std::string>();
     auto libpath = (*stg_config)["libpath"].value<std::string>();
-    stgs_.emplace_back(libpath.value());
+    stgs_.emplace_back(name.value(), libpath.value());
   }
   LOG_INFO("[StgManager]Add {} stgs", stgs_.size());
   return true;
