@@ -53,6 +53,35 @@ struct alignas(8) Depth {
 };
 static_assert(sizeof(Depth) == 192);
 
+struct alignas(8) NewOrder {
+  Timestamp create_time_; // +16 bytes
+  ID instrument_id_;      // +4 bytes
+  ID client_id_;          // +4 bytes
+  ID strategy_id_;        // +4 bytes
+  PriceType price_type_;  // +4 bytes
+  Direction direction_;   // +4 bytes
+  Price price_;           // +8 bytes
+  Volume volume_;         // +4 bytes
+};
+
+struct alignas(8) CancelOrder {
+  Timestamp create_time_; // +16 bytes
+  ID instrument_id_;      // +4 bytes
+  ID client_id_;          // +4 bytes
+  ID strategy_id_;        // +4 bytes
+};
+
+struct alignas(8) OrderUpdate {
+  Timestamp update_time_; // +16 bytes
+  ID instrument_id_;      // +4 bytes
+  ID order_id_;           // +4 bytes
+  ID client_id_;          // +4 bytes
+  Price price_;           // +8 bytes
+  Volume volume_;         // +4 bytes
+  Volume filled_volume_;  // +4 bytes
+  Volume pulled_volume_;  // +4 bytes
+};
+
 using Msg = std::variant<Bar, Static, Depth>;
 
 } // namespace ctptrader::base

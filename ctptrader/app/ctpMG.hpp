@@ -12,9 +12,9 @@
 
 namespace ctptrader::app {
 
-class Spi : public CThostFtdcMdSpi {
+class MdSpi : public CThostFtdcMdSpi {
 public:
-  Spi(CThostFtdcMdApi *api, const std::string &&broker_id,
+  MdSpi(CThostFtdcMdApi *api, const std::string &&broker_id,
       const std::string &&user_id, const std::string &&password,
       std::string_view shm_addr, std::vector<std::string> &instruments)
       : api_(api)
@@ -26,7 +26,7 @@ public:
     received_.resize(InstrumentCenter().Size(), false);
   }
 
-  ~Spi() {}
+  ~MdSpi() {}
 
   void OnFrontConnected() override;
   void OnFrontDisconnected(int nReason) override;

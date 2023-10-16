@@ -5,7 +5,7 @@
 
 namespace ctptrader::app {
 
-void Spi::OnFrontConnected() {
+void MdSpi::OnFrontConnected() {
   LOG_INFO("[CtpMG]Front connected");
   CThostFtdcReqUserLoginField req{};
   memset(&req, 0, sizeof(req));
@@ -19,15 +19,15 @@ void Spi::OnFrontConnected() {
   }
 }
 
-void Spi::OnFrontDisconnected(int nReason) {
+void MdSpi::OnFrontDisconnected(int nReason) {
   LOG_INFO("[CtpMG]Front disconnected. Reason = {}", nReason);
 }
 
-void Spi::OnHeartBeatWarning(int nTimeLapse) {
+void MdSpi::OnHeartBeatWarning(int nTimeLapse) {
   LOG_INFO("[CtpMG]Heart beat warning received. TimeLapse = {}", nTimeLapse);
 }
 
-void Spi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
+void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
                          CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                          bool bIsLast) {
   if (pRspInfo && pRspInfo->ErrorID == 0) {
@@ -48,26 +48,26 @@ void Spi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
   }
 }
 
-void Spi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout,
+void MdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout,
                           CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                           bool bIsLast) {
   LOG_INFO("[CtpMG]User logout success");
 }
 
-void Spi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID,
+void MdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                      bool bIsLast) {
   LOG_ERROR("[CtpMG]Response error.ErrorID = {}, ErrorMsg = {}",
             pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 }
 
-void Spi::OnRspSubMarketData(
+void MdSpi::OnRspSubMarketData(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   LOG_INFO("[CtpMG]Subscribe market data response received. InstrumentID = {}",
            pSpecificInstrument->InstrumentID);
 }
 
-void Spi::OnRspUnSubMarketData(
+void MdSpi::OnRspUnSubMarketData(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   LOG_INFO(
@@ -75,21 +75,21 @@ void Spi::OnRspUnSubMarketData(
       pSpecificInstrument->InstrumentID);
 }
 
-void Spi::OnRspSubForQuoteRsp(
+void MdSpi::OnRspSubForQuoteRsp(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   LOG_INFO("[CtpMG]Subscribe quote response received. InstrumentID = {}",
            pSpecificInstrument->InstrumentID);
 }
 
-void Spi::OnRspUnSubForQuoteRsp(
+void MdSpi::OnRspUnSubForQuoteRsp(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   LOG_INFO("[CtpMG]Unsubscribe quote response received. InstrumentID = {}",
            pSpecificInstrument->InstrumentID);
 }
 
-void Spi::OnRtnDepthMarketData(
+void MdSpi::OnRtnDepthMarketData(
     CThostFtdcDepthMarketDataField *pDepthMarketData) {
   fmt::println("{} {}", pDepthMarketData->ActionDay,
                pDepthMarketData->UpdateTime);
@@ -127,7 +127,7 @@ void Spi::OnRtnDepthMarketData(
   }
 }
 
-void Spi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp) {
+void MdSpi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp) {
   LOG_INFO("[CtpMG]Quote received. InstrumentID = {}",
            pForQuoteRsp->InstrumentID);
 }
@@ -158,7 +158,7 @@ bool CtpMG::Init(const toml::table &config) {
 
 void CtpMG::Start() {
   auto *api = CThostFtdcMdApi::CreateFtdcMdApi();
-  Spi spi(api, std::move(broker_id_), std::move(user_id_), std::move(password_),
+  MdSpi spi(api, std::move(broker_id_), std::move(user_id_), std::move(password_),
           channel_, instruments_);
   api->RegisterSpi(&spi);
   api->RegisterFront((char *)front_address_.c_str());
