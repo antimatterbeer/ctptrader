@@ -3,6 +3,7 @@ set(LIB_NAME appLib)
 add_library(${LIB_NAME} STATIC
     stgManager.cpp
     ctpMG.cpp
+    ctpTG.cpp
 )
 
 target_link_libraries(${LIB_NAME}
