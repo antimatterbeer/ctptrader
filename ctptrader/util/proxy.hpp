@@ -35,12 +35,10 @@ public:
     if (handle_) {
       dlclose(handle_);
     }
-    if (instance_) {
-      delete instance_;
-    }
+    delete instance_;
   }
 
-  bool IsValid() const { return instance_ != nullptr; }
+  [[nodiscard]] bool IsValid() const { return instance_ != nullptr; }
 
   T &Instance() { return *instance_; }
 

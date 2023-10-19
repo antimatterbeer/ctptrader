@@ -8,9 +8,9 @@ namespace ctptrader::base {
 
 class NonCopyable {
 public:
-  NonCopyable() {}
+  NonCopyable() = default;
 
-protected:
+public:
   NonCopyable(const NonCopyable &) = delete;
   NonCopyable &operator=(const NonCopyable &) = delete;
   NonCopyable(NonCopyable &&) = delete;

@@ -12,7 +12,7 @@ namespace ctptrader::util {
 
 template <int N> class CsvReader {
 public:
-  CsvReader(std::string_view path)
+  explicit CsvReader(std::string_view path)
       : reader_(path) {}
   ~CsvReader() = default;
 

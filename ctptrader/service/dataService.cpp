@@ -42,7 +42,7 @@ template <> bool RefCenter<CalendarDate>::FromCSV(std::string_view path) {
     bool is_trading_day_;
     int prev_trading_day_;
     int next_trading_day_;
-  } row;
+  } row{};
   std::vector<Row> cache;
   std::unordered_map<int, base::ID> id_map;
   while (reader.ReadRow(row.id_, row.date_, row.is_trading_day_,

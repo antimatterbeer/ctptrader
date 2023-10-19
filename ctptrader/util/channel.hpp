@@ -54,7 +54,7 @@ public:
   ShmSpscReader(std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Read(T &value) { return this->queue_->pop(value); }
-  bool Empty() const { return this->queue_->empty(); }
+  [[nodiscard]] bool Empty() const { return this->queue_->empty(); }
 };
 
 template <typename T, size_t Size>
@@ -63,7 +63,7 @@ public:
   ShmSpscWriter(std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Write(const T &value) { return this->queue_->push(value); }
-  bool Full() const { return this->queue_->full(); }
+  [[nodiscard]] bool Full() const { return this->queue_->full(); }
 };
 
 using MsgSender = ShmSpscWriter<base::Msg, BUFFER_SIZE>;
