@@ -9,7 +9,7 @@
 namespace ctptrader::base {
 
 struct alignas(8) Session {
-  Date tradding_day_;   // +4 bytes
+  Date trading_day_;   // +4 bytes
   bool is_day_trading_; // +1 bytes
 };
 static_assert(sizeof(Session) == 8);

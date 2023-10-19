@@ -18,9 +18,9 @@ public:
       const std::string &&user_id, const std::string &&password,
       std::string_view shm_addr, std::vector<std::string> &instruments)
       : api_(api)
-      , broker_id_(std::move(broker_id))
-      , user_id_(std::move(user_id))
-      , password_(std::move(password))
+      , broker_id_(broker_id)
+      , user_id_(user_id)
+      , password_(password)
       , instruments_(std::move(instruments))
       , tx_(shm_addr) {
     received_.resize(InstrumentCenter().Size(), false);
@@ -72,9 +72,9 @@ private:
 
 class CtpMG {
 public:
-  CtpMG(std::string_view channel)
+  explicit CtpMG(std::string_view channel)
       : channel_(channel) {}
-  ~CtpMG() {}
+  ~CtpMG() = default;
   bool Init(const toml::table &config);
   void Start();
 

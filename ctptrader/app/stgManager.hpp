@@ -14,7 +14,7 @@ namespace ctptrader::app {
 
 class StgManager : public base::NonCopyable {
 public:
-  StgManager(std::string_view market_channel)
+  explicit StgManager(std::string_view market_channel)
       : rx_(market_channel) {}
   ~StgManager() = default;
 

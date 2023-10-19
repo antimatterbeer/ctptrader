@@ -55,8 +55,8 @@ class Interest {
 public:
   void Reset(int size) { interests_.assign(size, false); }
   void SetInterest(base::ID id) { interests_[id] = true; }
-  bool IsInterested(base::ID id) const { return interests_[id]; }
-  int Size() const { return interests_.size(); }
+  [[nodiscard]] bool IsInterested(base::ID id) const { return interests_[id]; }
+  [[nodiscard]] int Size() const { return interests_.size(); }
 
 private:
   std::vector<bool> interests_;
