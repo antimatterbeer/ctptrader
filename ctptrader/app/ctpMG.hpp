@@ -15,8 +15,8 @@ namespace ctptrader::app {
 class MdSpi : public CThostFtdcMdSpi {
 public:
   MdSpi(CThostFtdcMdApi *api, const std::string &&broker_id,
-        const std::string &&user_id, const std::string &&password,
-        std::string_view shm_addr, std::vector<std::string> &instruments)
+      const std::string &&user_id, const std::string &&password,
+      std::string_view shm_addr, std::vector<std::string> &instruments)
       : api_(api)
       , broker_id_(broker_id)
       , user_id_(user_id)
