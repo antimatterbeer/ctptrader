@@ -3,16 +3,17 @@
 #include <dlfcn.h>
 #include <iostream>
 
+#include <boost/noncopyable.hpp>
+
 #include <base/msg.hpp>
 #include <base/stg.hpp>
 #include <util/channel.hpp>
-
 #include <service/dataService.hpp>
 #include <util/proxy.hpp>
 
 namespace ctptrader::app {
 
-class StgManager : public base::NonCopyable {
+class StgManager : public boost::noncopyable {
 public:
   explicit StgManager(std::string_view market_channel)
       : rx_(market_channel) {}

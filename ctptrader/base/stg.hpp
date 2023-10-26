@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include <boost/noncopyable.hpp>
 #include <toml.hpp>
 
 #include <base/def.hpp>
@@ -9,7 +10,7 @@
 
 namespace ctptrader::base {
 
-class Stg : public NonCopyable {
+class Stg : public boost::noncopyable {
 public:
   using Ptr = Stg *;
   using Creator = Stg *(*)();

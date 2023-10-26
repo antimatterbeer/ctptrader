@@ -6,17 +6,6 @@
 
 namespace ctptrader::base {
 
-class NonCopyable {
-public:
-  NonCopyable() = default;
-
-public:
-  NonCopyable(const NonCopyable &) = delete;
-  NonCopyable &operator=(const NonCopyable &) = delete;
-  NonCopyable(NonCopyable &&) = delete;
-  NonCopyable &operator=(NonCopyable &&) = delete;
-};
-
 /// @brief ID type
 using ID = int64_t;
 
