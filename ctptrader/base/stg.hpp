@@ -14,29 +14,32 @@ namespace ctptrader::base {
 class IStrategy : public boost::noncopyable {
 public:
   virtual ~IStrategy() = default;
-
   virtual void Init() = 0;
-
-  virtual void OnStatic(const Static &static_data) {}
-
-  virtual void OnDepth(const Depth &depth_data) {}
-
-  virtual void OnBar(const Bar &bar_data) {}
-
-  void SetContext(Context *context) {
-    context_ = context;
-    instrument_interest_.resize(context_->GetSymbols().size(), 0);
+  virtual void OnStatic(const Static &st) {}
+  virtual void OnDepth(const Depth &depth) {}
+  virtual void OnBar(const Bar &bar) {}
+  virtual void OnBalance(const Balance &bal) {}
+  void SetContext(Context *ctx) {
+    ctx_ = ctx;
+    instrument_interest_.assign(ctx->InstrumentCenter().Size(), 0);
+    account_interest_.assign(ctx->AccountCenter().Size(), 0);
+  }
+  [[nodiscard]] bool IsInstrumentInterested(ID id) const {
+    return instrument_interest_[id] > 0;
+  }
+  [[nodiscard]] bool IsAccountInterested(ID id) const {
+    return account_interest_[id] > 0;
   }
 
-  bool IsInterested(ID id) const { return instrument_interest_[id] > 0; }
-
 protected:
-  Context *GetContext() const { return context_; }
-  void SetInterest(ID id) { instrument_interest_[id] = 1; }
+  [[nodiscard]] Context *GetContext() const { return ctx_; }
+  void SetInstrumentInterest(ID id) { instrument_interest_[id] = 1; }
+  void SetAccountInterest(ID id) { account_interest_[id] = 1; }
 
 private:
-  Context *context_;
+  Context *ctx_;
   std::vector<int> instrument_interest_;
+  std::vector<int> account_interest_;
 };
 
 } // namespace ctptrader::base

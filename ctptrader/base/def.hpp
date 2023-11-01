@@ -9,6 +9,10 @@ namespace ctptrader::base {
 /// @brief ID type
 using ID = int64_t;
 
+using InstrumentID = int64_t;
+
+using AccountID = int64_t;
+
 /// @brief Price type
 using Price = double;
 

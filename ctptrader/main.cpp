@@ -12,42 +12,47 @@ using namespace ctptrader;
 class Runner {
 public:
   ~Runner() {
-    delete context_;
-    for (auto strategy : strategies_) {
-      delete strategy;
+    for (auto s : strategies_) {
+      delete s;
     }
   }
 
-  void Init(const std::vector<std::string> &symbols) {
-    context_ = new base::Context(symbols);
-    for (auto strategy : strategies_) {
-      strategy->SetContext(context_);
-      strategy->Init();
+  void Init(const std::string &folder_path) {
+    ctx_.Init(folder_path);
+    for (auto s : strategies_) {
+      s->SetContext(&ctx_);
+      s->Init();
     }
   }
 
-  void AddStrategy(base::IStrategy *strategy) {
-    strategies_.push_back(strategy);
-  }
+  void AddStrategy(base::IStrategy *s) { strategies_.push_back(s); }
 
   void OnStatic(const base::Static &st) {
-    for (auto strategy : strategies_) {
-      if (strategy->IsInterested(st.instrument_id_))
-        strategy->OnStatic(st);
+    for (auto s : strategies_) {
+      if (s->IsInstrumentInterested(st.id_))
+        s->OnStatic(st);
     }
-    context_->OnStatic(st);
+    ctx_.OnStatic(st);
   }
 
   void OnBar(const base::Bar &bar) {
-    for (auto strategy : strategies_) {
-      if (strategy->IsInterested(bar.instrument_id_))
-        strategy->OnBar(bar);
+    for (auto s : strategies_) {
+      if (s->IsInstrumentInterested(bar.id_))
+        s->OnBar(bar);
     }
-    context_->OnBar(bar);
+    ctx_.OnBar(bar);
+  }
+
+  void OnBalance(const base::Balance &bal) {
+    for (auto s : strategies_) {
+      if (s->IsAccountInterested(bal.id_))
+        s->OnBalance(bal);
+    }
+    ctx_.OnBalance(bal);
   }
 
 private:
-  base::Context *context_;
+  base::Context ctx_;
   std::vector<base::IStrategy *> strategies_;
 };
 
