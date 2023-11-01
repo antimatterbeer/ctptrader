@@ -6,4 +6,5 @@ add_library(${LIB_NAME} STATIC
     timestamp.cpp
     msg.cpp
     stg.cpp
+    context.cpp
 )

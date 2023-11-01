@@ -3,42 +3,52 @@
 
 #include <toml.hpp>
 
-#include <app/ctpMG.hpp>
-#include <app/stgManager.hpp>
+#include <base/context.hpp>
 #include <base/msg.hpp>
 #include <base/stg.hpp>
 
 using namespace ctptrader;
 
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    std::cout << "Usage: " << argv[0] << " config.toml" << std::endl;
-    return 1;
+class Runner {
+public:
+  ~Runner() {
+    delete context_;
+    for (auto strategy : strategies_) {
+      delete strategy;
+    }
   }
 
-  auto res = toml::parse_file(argv[1]);
-  if (!res.is_table()) {
-    std::cout << "Error: " << argv[1] << " is not a valid toml file"
-              << std::endl;
-    return 1;
+  void Init(const std::vector<std::string> &symbols) {
+    context_ = new base::Context(symbols);
+    for (auto strategy : strategies_) {
+      strategy->SetContext(context_);
+      strategy->Init();
+    }
   }
-  auto config = res.as_table();
-  auto data_folder = (*config)["data_folder"].value_or<std::string>("");
-  auto market_channel = (*config)["market_channel"].value_or<std::string>("");
-  if (data_folder.empty() || market_channel.empty()) {
-    std::cerr << "Error: data_folder or market_channel is not specified"
-              << std::endl;
+
+  void AddStrategy(base::IStrategy *strategy) {
+    strategies_.push_back(strategy);
   }
-  DataService().Init(data_folder);
-  auto pid = fork();
-  if (pid == 0) {
-    app::StgManager sm(market_channel);
-    sm.Init(*(*config)["stgManager"].as_table());
-    sm.Start();
-  } else {
-    app::CtpMG mg(market_channel);
-    mg.Init(*(*config)["ctpMG"].as_table());
-    mg.Start();
+
+  void OnStatic(const base::Static &st) {
+    for (auto strategy : strategies_) {
+      if (strategy->IsInterested(st.instrument_id_))
+        strategy->OnStatic(st);
+    }
+    context_->OnStatic(st);
   }
-  return 0;
-}
+
+  void OnBar(const base::Bar &bar) {
+    for (auto strategy : strategies_) {
+      if (strategy->IsInterested(bar.instrument_id_))
+        strategy->OnBar(bar);
+    }
+    context_->OnBar(bar);
+  }
+
+private:
+  base::Context *context_;
+  std::vector<base::IStrategy *> strategies_;
+};
+
+int main(int argc, char *argv[]) { return 0; }
