@@ -15,7 +15,7 @@ find_package(Boost REQUIRED COMPONENTS system filesystem)
 find_package(GTest REQUIRED)
 find_package(CURL REQUIRED)
 
-# pre-compiled packages
+# third party
 set(THIRDPARTY ${CMAKE_SOURCE_DIR}/thirdparty)
 
 include_directories(${THIRDPARTY}/csv-parser/include)
@@ -23,16 +23,10 @@ include_directories(${THIRDPARTY}/spdlog/include)
 include_directories(${THIRDPARTY}/tomlplusplus/include)
 include_directories(${THIRDPARTY}/fmt/include)
 include_directories(${THIRDPARTY}/rapidjson/include)
+include_directories(${THIRDPARTY}/cmdline/include)
+include_directories(${THIRDPARTY}/tomlplusplus/include)
 include_directories(${THIRDPARTY}/ctp/include)
 
 include_directories(ctptrader)
 add_subdirectory(ctptrader)
-
-# if(BUILD_TESTING)
-#     enable_testing()
-#     add_subdirectory(test)
-# endif()
-
-# if(BUILD_DEMO)
-#     add_subdirectory(demo)
-# endif()
+add_subdirectory(demo)

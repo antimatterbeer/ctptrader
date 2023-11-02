@@ -1,42 +1,36 @@
 #pragma once
 
-#include <base/stg.hpp>
-#include <service/dataService.hpp>
+#include <core/ctx.hpp>
+#include <core/stg.hpp>
 
-namespace ctptrader::demo {
+namespace ctptrader::logger {
 
-class Logger : public base::Stg {
+class Logger : public core::IStrategy {
 public:
   ~Logger() = default;
-  bool Init(const toml::table &config) override {
-    LOG_INFO("[Logger]Init");
-    return true;
-  }
 
-  void OnSession(const base::Session &session) override {
-    LOG_INFO("[Logger]OnSession");
-  }
-
-  void OnBar(const base::Bar &bar) override {
-    LOG_INFO("[Logger]OnBar. open: {} high: {} low: {} close: {} volume: {} "
-             "turnover: {}",
-             bar.open_, bar.high_, bar.low_, bar.close_, bar.volume_,
-             bar.turnover_);
+  void Init(toml::table config) override {
+    auto inst_id = GetContext()->InstrumentRef().GetID("cu2311");
+    WatchInstrument(inst_id);
+    auto acc_id = GetContext()->AccountRef().GetID("test001");
+    WatchAccount(acc_id);
   }
 
   void OnStatic(const base::Static &st) override {
-    LOG_INFO("[Logger]OnStatic. instrument_id: {} prev_close: {}",
-             st.instrument_id_, st.prev_close_);
+    GetContext()->Logger()->info("On static");
   }
 
   void OnDepth(const base::Depth &depth) override {
-    LOG_INFO("[Logger]OnDepth. instrument_id: {} update_time: {}, last: {}",
-             depth.instrument_id_, depth.update_time_.ToString(), depth.last_);
+    GetContext()->Logger()->info("On depth");
   }
 
-  void OnEndOfDay(const base::Date &Date) override {
-    LOG_INFO("[Logger]OnEndOfDay. date: {}", Date.ToString());
+  void OnBar(const base::Bar &bar) override {
+    GetContext()->Logger()->info("On bar");
+  }
+
+  void OnBalance(const base::Balance &bal) override {
+    GetContext()->Logger()->info("On balance");
   }
 };
 
-} // namespace ctptrader::demo
+} // namespace ctptrader::logger

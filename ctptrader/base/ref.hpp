@@ -8,7 +8,7 @@
 namespace ctptrader::base {
 
 struct Underlying {
-  ID id_;
+  UnderlyingID id_;
   std::string name_;
   Exchange exchange_;
   Mutiple multiple_;
@@ -17,7 +17,8 @@ struct Underlying {
 };
 
 struct Instrument {
-  ID id_;
+  InstrumentID id_;
+  UnderlyingID underlying_id_;
   std::string name_;
   std::string underlying_;
   InstrumentType type_;
@@ -28,7 +29,7 @@ struct Instrument {
 };
 
 struct CalendarDate {
-  ID id_;
+  DateID id_;
   std::string name_;
   Date date_;
   bool is_trading_day_;

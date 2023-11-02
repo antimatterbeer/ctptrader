@@ -1,10 +1,11 @@
 #include "logger.hpp"
 
-using namespace ctptrader::demo;
+using namespace ctptrader::logger;
 
 extern "C" {
 
-Logger::Ptr creator() { return new Logger(); }
+Logger *creator() { return new Logger(); }
 
-void deleter(Logger::Ptr p) { delete p; }
+void deleter(Logger *p) { delete p; }
+
 }

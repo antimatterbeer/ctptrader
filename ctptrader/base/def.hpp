@@ -9,9 +9,17 @@ namespace ctptrader::base {
 /// @brief ID type
 using ID = int64_t;
 
-using InstrumentID = int64_t;
+/// @brief Instrument ID type
+using InstrumentID = ID;
 
-using AccountID = int64_t;
+/// @brief Underlying ID type
+using UnderlyingID = ID;
+
+/// @brief Account ID type
+using AccountID = ID;
+
+/// @brief Calendar ID type
+using DateID = ID;
 
 /// @brief Price type
 using Price = double;

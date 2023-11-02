@@ -89,6 +89,6 @@ struct alignas(8) OrderUpdate {
   Volume pulled_volume_;  // +4 bytes
 };
 
-using Msg = std::variant<Bar, Static, Depth>;
+using Msg = std::variant<Bar, Static, Depth, Balance>;
 
 } // namespace ctptrader::base

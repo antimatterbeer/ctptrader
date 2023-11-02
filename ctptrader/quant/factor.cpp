@@ -1,1 +1,0 @@
-#include <quant/factor.hpp>

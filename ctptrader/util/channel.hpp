@@ -1,19 +1,12 @@
 #pragma once
 
-#include <string_view>
-#include <tuple>
-
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 
-#include <base/msg.hpp>
-
 namespace ctptrader::util {
 
 namespace bip = boost::interprocess;
-
-const size_t BUFFER_SIZE = 256;
 
 template <typename T, size_t Size> class ShmSpscQueue {
   using QueueType =
@@ -65,9 +58,5 @@ public:
   bool Write(const T &value) { return this->queue_->push(value); }
   [[nodiscard]] bool Full() const { return this->queue_->full(); }
 };
-
-using MsgSender = ShmSpscWriter<base::Msg, BUFFER_SIZE>;
-
-using MsgReceiver = ShmSpscReader<base::Msg, BUFFER_SIZE>;
 
 } // namespace ctptrader::util

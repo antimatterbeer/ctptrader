@@ -3,6 +3,7 @@
 #include <compare>
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <time.h>
 
 namespace ctptrader::base {
