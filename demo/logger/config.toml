@@ -1,5 +1,16 @@
-data_folder = "./dat"
+[global]
+market_channel = "md_channel"
+data_folder = "../dat"
+broker_id = "9999"
+user_id = "userid"
+password = "password"
 
-[[stg]]
+[market]
+front = "180.168.146.187:10131"
+instruments = ["cu2311", "cu2312", "cu2401"]
+
+[[strategy.stg]]
 name = "logger"
-libpath = "./build/bin/liblogger.so"
+libpath = "./bin/liblogger.so"
+instruments = ["cu2311", "cu2312", "cu2401"]
+accounts = ["test001"]
