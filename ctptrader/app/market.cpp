@@ -115,7 +115,6 @@ void MdSpi::OnRspUnSubForQuoteRsp(
 
 void MdSpi::OnRtnDepthMarketData(
     CThostFtdcDepthMarketDataField *pDepthMarketData) {
-
   auto id = ctx_.InstrumentRef().GetID(pDepthMarketData->InstrumentID);
   if (!received_[id] == 0) {
     static_.id_ = id;
@@ -124,7 +123,9 @@ void MdSpi::OnRtnDepthMarketData(
     static_.prev_close_ = pDepthMarketData->PreClosePrice;
     static_.upper_limit_ = pDepthMarketData->UpperLimitPrice;
     static_.lower_limit_ = pDepthMarketData->LowerLimitPrice;
-    tx_.Write(static_);
+    if (!tx_.Write(static_)) {
+      ctx_.Logger()->error("Failed to write static data to tx");
+    }
     received_[id] = 1;
   }
 
@@ -140,7 +141,9 @@ void MdSpi::OnRtnDepthMarketData(
   depth_.bid_price_[0] = pDepthMarketData->BidPrice1;
   depth_.ask_volume_[0] = pDepthMarketData->AskVolume1;
   depth_.bid_volume_[0] = pDepthMarketData->BidVolume1;
-  tx_.Write(depth_);
+  if (!tx_.Write(depth_)) {
+    ctx_.Logger()->error("Failed to write depth data to tx");
+  }
 }
 
 void MdSpi::SetInterests(std::vector<std::string> instruments) {

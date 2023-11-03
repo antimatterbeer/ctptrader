@@ -108,7 +108,6 @@ inline int start_market(toml::table &global_config, toml::table &app_config) {
     std::cerr << "Failed to initialize context.\n";
     return 1;
   }
-  ctx.Logger()->info("Market channel: {}", market_channel);
   auto front_address = fmt::format("tcp://{}", market_front.data());
   auto *api = CThostFtdcMdApi::CreateFtdcMdApi();
   MdSpi spi(std::move(ctx), market_channel, broker_id, user_id, password, api);
