@@ -9,7 +9,7 @@ class Logger : public core::IStrategy {
 public:
   ~Logger() = default;
 
-  void Init(toml::table config) override {
+  void Init(toml::table& config) override {
     auto inst_id = GetContext()->InstrumentRef().GetID("cu2311");
     WatchInstrument(inst_id);
     auto acc_id = GetContext()->AccountRef().GetID("test001");
