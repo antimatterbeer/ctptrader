@@ -13,7 +13,7 @@ public:
     for (auto &i : *config["instruments"].as_array()) {
       auto inst = i.value<std::string>();
       if (inst.has_value()) {
-        auto inst_id = GetContext()->InstrumentRef().GetID(inst.value());
+        auto inst_id = GetContext()->InstrumentCenter().GetID(inst.value());
         if (inst_id > 0) {
           WatchInstrument(inst_id);
         }
@@ -22,7 +22,7 @@ public:
     for (auto &a : *config["accounts"].as_array()) {
       auto acc = a.value<std::string>();
       if (acc.has_value()) {
-        auto acc_id = GetContext()->AccountRef().GetID(acc.value());
+        auto acc_id = GetContext()->AccountCenter().GetID(acc.value());
         if (acc_id > 0) {
           WatchAccount(acc_id);
         }

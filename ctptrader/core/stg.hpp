@@ -19,8 +19,8 @@ public:
 
   void SetContext(Context *ctx) {
     ctx_ = ctx;
-    ins_interests_.assign(ctx->InstrumentRef().Size(), 0);
-    acc_interests_.assign(ctx->AccountRef().Size(), 0);
+    ins_interests_.assign(ctx->InstrumentCenter().Size(), 0);
+    acc_interests_.assign(ctx->AccountCenter().Size(), 0);
   }
 
   [[nodiscard]] bool WatchesInstrument(base::InstrumentID id) const {

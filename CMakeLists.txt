@@ -17,7 +17,6 @@ find_package(CURL REQUIRED)
 
 # third party
 set(THIRDPARTY ${CMAKE_SOURCE_DIR}/thirdparty)
-
 include_directories(${THIRDPARTY}/csv-parser/include)
 include_directories(${THIRDPARTY}/spdlog/include)
 include_directories(${THIRDPARTY}/tomlplusplus/include)
@@ -26,6 +25,8 @@ include_directories(${THIRDPARTY}/rapidjson/include)
 include_directories(${THIRDPARTY}/cmdline/include)
 include_directories(${THIRDPARTY}/tomlplusplus/include)
 include_directories(${THIRDPARTY}/ctp/include)
+
+enable_testing()
 
 include_directories(ctptrader)
 add_subdirectory(ctptrader)

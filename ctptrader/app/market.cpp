@@ -32,7 +32,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
     std::vector<char *> instruments;
     for (auto i = 0; i < interests_.size(); ++i) {
       if (interests_[i] == 1) {
-        auto name = ctx_.InstrumentRef().Get(i).name_;
+        auto name = ctx_.InstrumentCenter().Get(i).name_;
         instruments.push_back(const_cast<char *>(name.c_str()));
       }
     }
@@ -115,7 +115,7 @@ void MdSpi::OnRspUnSubForQuoteRsp(
 
 void MdSpi::OnRtnDepthMarketData(
     CThostFtdcDepthMarketDataField *pDepthMarketData) {
-  auto id = ctx_.InstrumentRef().GetID(pDepthMarketData->InstrumentID);
+  auto id = ctx_.InstrumentCenter().GetID(pDepthMarketData->InstrumentID);
   if (!received_[id] == 0) {
     static_.id_ = id;
     // static_.trading_day_ =
@@ -147,10 +147,10 @@ void MdSpi::OnRtnDepthMarketData(
 }
 
 void MdSpi::SetInterests(std::vector<std::string> instruments) {
-  interests_.assign(ctx_.InstrumentRef().Size(), 0);
-  received_.assign(ctx_.InstrumentRef().Size(), 0);
+  interests_.assign(ctx_.InstrumentCenter().Size(), 0);
+  received_.assign(ctx_.InstrumentCenter().Size(), 0);
   for (auto &i : instruments) {
-    auto id = ctx_.InstrumentRef().GetID(i);
+    auto id = ctx_.InstrumentCenter().GetID(i);
     if (id >= 0) {
       interests_[id] = 1;
     }

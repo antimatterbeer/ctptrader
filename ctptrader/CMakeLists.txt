@@ -11,7 +11,6 @@ target_link_libraries(${PROJECT_NAME}
     coreLib 
     appLib
     Boost::system
-    ${THIRDPARTY}/fmt/lib/libfmt.a
     ${THIRDPARTY}/ctp/lib/libthostmduserapi_se.so
     ${THIRDPARTY}/ctp/lib/libthosttraderapi_se.so
 )
