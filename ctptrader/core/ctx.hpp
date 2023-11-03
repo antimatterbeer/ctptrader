@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <string_view>
 #include <type_traits>
 #include <vector>
@@ -40,7 +39,9 @@ public:
   }
 
   void Push(const T &value) { buffer_[value.id_].push_back(value); }
+
   [[nodiscard]] const T &Back(base::ID id) const { return buffer_[id].back(); }
+
   [[nodiscard]] const T &Prev(base::ID id) const {
     return buffer_[id][buffer_[id].size() - 2];
   }

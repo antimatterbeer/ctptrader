@@ -44,7 +44,7 @@ protected:
 template <typename T, size_t Size>
 class ShmSpscReader : private ShmSpscQueue<T, Size> {
 public:
-  ShmSpscReader(std::string_view name)
+  explicit ShmSpscReader(std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Read(T &value) { return this->queue_->pop(value); }
   [[nodiscard]] bool Empty() const { return this->queue_->empty(); }
@@ -53,7 +53,7 @@ public:
 template <typename T, size_t Size>
 class ShmSpscWriter : private ShmSpscQueue<T, Size> {
 public:
-  ShmSpscWriter(std::string_view name)
+   ShmSpscWriter(std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Write(const T &value) { return this->queue_->push(value); }
   [[nodiscard]] bool Full() const { return this->queue_->full(); }

@@ -11,7 +11,7 @@ namespace ctptrader::core {
 class IStrategy : public boost::noncopyable {
 public:
   virtual ~IStrategy() = default;
-  virtual void Init(toml::table config) = 0;
+  virtual void Init(toml::table &config) = 0;
   virtual void OnStatic(const base::Static &st) {}
   virtual void OnDepth(const base::Depth &depth) {}
   virtual void OnBar(const base::Bar &bar) {}
