@@ -5,4 +5,5 @@ add_library(${LIB_NAME} STATIC
     buf_center.cpp
     ctx.cpp
     stg.cpp
+    app.cpp
 )

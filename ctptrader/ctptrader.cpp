@@ -17,11 +17,15 @@ int main(int argc, char *argv[]) {
   auto global_config = *config["global"].as_table();
   auto market_config = *config["market"].as_table();
   auto strategy_config = *config["strategy"].as_table();
-  auto pid = fork();
-  if (pid == 0) {
-    app::start_strategy(global_config, strategy_config);
-  } else {
-    app::start_market(global_config, market_config);
-  }
+  // auto pid = fork();
+  // if (pid == 0) {
+  //   app::StrategyManager sm("market_channel");
+  //   sm.Init(global_config, strategy_config);
+  //   sm.Run();
+  // } else {
+    app::MarketManager mm("market_channel");
+    mm.Init(global_config, market_config);
+    mm.Run();
+  // }
   return 0;
 }

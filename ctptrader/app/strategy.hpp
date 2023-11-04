@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/app.hpp>
 #include <core/ctx.hpp>
 #include <core/stg.hpp>
 #include <util/channel.hpp>
@@ -7,26 +8,14 @@
 
 namespace ctptrader::app {
 
-class StgManager {
+class StrategyManager : public core::IApp {
 public:
-  StgManager(core::Context &&ctx, std::string_view market_channel)
-      : ctx_(std::move(ctx))
-      , md_rx_(market_channel) {}
+  StrategyManager(std::string_view market_channel)
+      : md_rx_(market_channel) {}
 
-  void AddStrategy(toml::table &config) {
-    auto name = config["name"].value<std::string>();
-    auto libpath = config["libpath"].value<std::string>();
-    if (!name.has_value() || !libpath.has_value()) {
-      ctx_.Logger()->error("Failed to load strategy.");
-      return;
-    }
-    stgs_.emplace_back(name.value(), libpath.value());
-    stgs_.back().Instance().SetContext(&ctx_);
-    stgs_.back().Instance().Init(config);
-    ctx_.Logger()->info("Loaded strategy: {}", name.value());
-  }
+  bool Init(toml::table &global_config, toml::table &app_config) override;
 
-  void OnMsg(const base::Msg &msg) { std::visit(*this, msg); }
+  void Run() override;
 
   void operator()(const base::Static &st) {
     for (auto &s : stgs_) {
@@ -64,37 +53,10 @@ public:
     ctx_.OnBalance(bal);
   }
 
-  void Start() {
-    base::Msg msg;
-    while (true) {
-      if (md_rx_.Read(msg)) {
-        OnMsg(msg);
-      }
-    }
-  }
-
 private:
-  core::Context ctx_;
   util::ShmSpscReader<base::Msg, 20> md_rx_;
   std::vector<util::Proxy<core::IStrategy>> stgs_;
+  bool stop_ = false;
 };
-
-inline int start_strategy(toml::table &global_config, toml::table &app_config) {
-  std::string market_channel = global_config["market_channel"].value_or("");
-  std::string data_folder = global_config["data_folder"].value_or("");
-  auto stgs = *app_config["stg"].as_array();
-  core::Context ctx;
-  if (!ctx.Init(data_folder)) {
-    std::cerr << "Failed to initialize context.\n";
-    return 1;
-  }
-  StgManager app(std::move(ctx), market_channel);
-  for (auto &s : stgs) {
-    auto stg = *s.as_table();
-    app.AddStrategy(stg);
-  }
-  app.Start();
-  return 0;
-}
 
 } // namespace ctptrader::app

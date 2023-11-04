@@ -3,43 +3,43 @@
 namespace ctptrader::app {
 
 void MdSpi::OnFrontConnected() {
-  ctx_.Logger()->info("Connected to market server, sending login request");
+  ctx_->Logger()->info("Connected to market server, sending login request");
   CThostFtdcReqUserLoginField req{};
   memset(&req, 0, sizeof(req));
   strcpy(req.BrokerID, broker_id_.c_str());
   strcpy(req.UserID, user_id_.c_str());
   strcpy(req.Password, password_.c_str());
   if (api_->ReqUserLogin(&req, 0) != 0) {
-    ctx_.Logger()->error("Sending login request failed");
+    ctx_->Logger()->error("Sending login request failed");
   } else {
-    ctx_.Logger()->info("Sending login request succeeded");
+    ctx_->Logger()->info("Sending login request succeeded");
   }
 }
 
 void MdSpi::OnFrontDisconnected(int nReason) {
-  ctx_.Logger()->info("Disconnected from market server, reason: {}", nReason);
+  ctx_->Logger()->info("Disconnected from market server, reason: {}", nReason);
 }
 
 void MdSpi::OnHeartBeatWarning(int nTimeLapse) {
-  ctx_.Logger()->info("Heartbeat warning, time lapse: {}", nTimeLapse);
+  ctx_->Logger()->info("Heartbeat warning, time lapse: {}", nTimeLapse);
 }
 
 void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
                            CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                            bool bIsLast) {
   if (pRspInfo->ErrorID == 0) {
-    ctx_.Logger()->info("Login succeeded. Subscribing market data");
+    ctx_->Logger()->info("Login succeeded. Subscribing market data");
     std::vector<char *> instruments;
     for (auto i = 0; i < interests_.size(); ++i) {
       if (interests_[i] == 1) {
-        auto name = ctx_.InstrumentCenter().Get(i).name_;
+        auto name = ctx_->InstrumentCenter().Get(i).name_;
         instruments.push_back(const_cast<char *>(name.c_str()));
       }
     }
     api_->SubscribeMarketData(instruments.data(), instruments.size());
   } else {
-    ctx_.Logger()->error("Login failed, error id: {}, error message: {}",
-                         pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+    ctx_->Logger()->error("Login failed, error id: {}, error message: {}",
+                          pRspInfo->ErrorID, pRspInfo->ErrorMsg);
   }
 }
 
@@ -47,27 +47,27 @@ void MdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout,
                             CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                             bool bIsLast) {
   if (pRspInfo->ErrorID == 0) {
-    ctx_.Logger()->info("Logout succeeded");
+    ctx_->Logger()->info("Logout succeeded");
   } else {
-    ctx_.Logger()->error("Logout failed, error id: {}, error message: {}",
-                         pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+    ctx_->Logger()->error("Logout failed, error id: {}, error message: {}",
+                          pRspInfo->ErrorID, pRspInfo->ErrorMsg);
   }
 }
 
 void MdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                        bool bIsLast) {
-  ctx_.Logger()->error("Error, error id: {}, error message: {}",
-                       pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+  ctx_->Logger()->error("Error, error id: {}, error message: {}",
+                        pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 }
 
 void MdSpi::OnRspSubMarketData(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   if (pRspInfo->ErrorID == 0) {
-    ctx_.Logger()->info("Subscribing market data succeeded, instrument id: {}",
-                        pSpecificInstrument->InstrumentID);
+    ctx_->Logger()->info("Subscribing market data succeeded, instrument id: {}",
+                         pSpecificInstrument->InstrumentID);
   } else {
-    ctx_.Logger()->error(
+    ctx_->Logger()->error(
         "Subscribing market data failed, error id: {}, error message: {}",
         pRspInfo->ErrorID, pRspInfo->ErrorMsg);
   }
@@ -77,11 +77,11 @@ void MdSpi::OnRspUnSubMarketData(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   if (pRspInfo->ErrorID == 0) {
-    ctx_.Logger()->info(
+    ctx_->Logger()->info(
         "Unsubscribing market data succeeded, instrument id: {}",
         pSpecificInstrument->InstrumentID);
   } else {
-    ctx_.Logger()->error(
+    ctx_->Logger()->error(
         "Unsubscribing market data failed, error id: {}, error message: {}",
         pRspInfo->ErrorID, pRspInfo->ErrorMsg);
   }
@@ -91,10 +91,10 @@ void MdSpi::OnRspSubForQuoteRsp(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   if (pRspInfo->ErrorID == 0) {
-    ctx_.Logger()->info("Subscribing quote data succeeded, instrument id: {}",
-                        pSpecificInstrument->InstrumentID);
+    ctx_->Logger()->info("Subscribing quote data succeeded, instrument id: {}",
+                         pSpecificInstrument->InstrumentID);
   } else {
-    ctx_.Logger()->error(
+    ctx_->Logger()->error(
         "Subscribing quote data failed, error id: {}, error message: {}",
         pRspInfo->ErrorID, pRspInfo->ErrorMsg);
   }
@@ -104,10 +104,11 @@ void MdSpi::OnRspUnSubForQuoteRsp(
     CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
   if (pRspInfo->ErrorID == 0) {
-    ctx_.Logger()->info("Unsubscribing quote data succeeded, instrument id: {}",
-                        pSpecificInstrument->InstrumentID);
+    ctx_->Logger()->info(
+        "Unsubscribing quote data succeeded, instrument id: {}",
+        pSpecificInstrument->InstrumentID);
   } else {
-    ctx_.Logger()->error(
+    ctx_->Logger()->error(
         "Unsubscribing quote data failed, error id: {}, error message: {}",
         pRspInfo->ErrorID, pRspInfo->ErrorMsg);
   }
@@ -115,7 +116,7 @@ void MdSpi::OnRspUnSubForQuoteRsp(
 
 void MdSpi::OnRtnDepthMarketData(
     CThostFtdcDepthMarketDataField *pDepthMarketData) {
-  auto id = ctx_.InstrumentCenter().GetID(pDepthMarketData->InstrumentID);
+  auto id = ctx_->InstrumentCenter().GetID(pDepthMarketData->InstrumentID);
   if (!received_[id] == 0) {
     static_.id_ = id;
     // static_.trading_day_ =
@@ -124,7 +125,7 @@ void MdSpi::OnRtnDepthMarketData(
     static_.upper_limit_ = pDepthMarketData->UpperLimitPrice;
     static_.lower_limit_ = pDepthMarketData->LowerLimitPrice;
     if (!tx_.Write(static_)) {
-      ctx_.Logger()->error("Failed to write static data to tx");
+      ctx_->Logger()->error("Failed to write static data to tx");
     }
     received_[id] = 1;
   }
@@ -142,15 +143,15 @@ void MdSpi::OnRtnDepthMarketData(
   depth_.ask_volume_[0] = pDepthMarketData->AskVolume1;
   depth_.bid_volume_[0] = pDepthMarketData->BidVolume1;
   if (!tx_.Write(depth_)) {
-    ctx_.Logger()->error("Failed to write depth data to tx");
+    ctx_->Logger()->error("Failed to write depth data to tx");
   }
 }
 
 void MdSpi::SetInterests(std::vector<std::string> instruments) {
-  interests_.assign(ctx_.InstrumentCenter().Size(), 0);
-  received_.assign(ctx_.InstrumentCenter().Size(), 0);
+  interests_.assign(ctx_->InstrumentCenter().Size(), 0);
+  received_.assign(ctx_->InstrumentCenter().Size(), 0);
   for (auto &i : instruments) {
-    auto id = ctx_.InstrumentCenter().GetID(i);
+    auto id = ctx_->InstrumentCenter().GetID(i);
     if (id >= 0) {
       interests_[id] = 1;
     }
