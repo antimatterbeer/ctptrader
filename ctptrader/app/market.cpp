@@ -148,8 +148,8 @@ void MdSpi::OnRtnDepthMarketData(
 }
 
 void MdSpi::SetInterests(std::vector<std::string> instruments) {
-  interests_.assign(ctx_->InstrumentCenter().Size(), 0);
-  received_.assign(ctx_->InstrumentCenter().Size(), 0);
+  interests_.assign(ctx_->InstrumentCenter().Count(), 0);
+  received_.assign(ctx_->InstrumentCenter().Count(), 0);
   for (auto &i : instruments) {
     auto id = ctx_->InstrumentCenter().GetID(i);
     if (id >= 0) {

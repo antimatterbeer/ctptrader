@@ -32,15 +32,15 @@ bool Context::Init(std::string_view data_folder) {
               << std::endl;
     return false;
   }
-  for (auto i = 0; i < ins_center_.Size(); ++i) {
+  for (auto i = 0; i < ins_center_.Count(); ++i) {
     auto uly_id = uly_center_.GetID(ins_center_.Get(i).underlying_);
     ins_center_.vec_[i].underlying_id_ = uly_id;
   }
 
-  st_center_.Resize(ins_center_.Size());
-  bar_center_.Resize(ins_center_.Size());
-  depth_center_.Resize(ins_center_.Size());
-  bal_center_.Resize(acc_center_.Size());
+  st_center_.Resize(ins_center_.Count());
+  bar_center_.Resize(ins_center_.Count());
+  depth_center_.Resize(ins_center_.Count());
+  bal_center_.Resize(acc_center_.Count());
   return true;
 }
 

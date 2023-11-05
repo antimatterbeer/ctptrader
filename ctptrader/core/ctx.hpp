@@ -34,28 +34,28 @@ public:
    *
    * @param st The static data to be handled.
    */
-  void OnStatic(const base::Static &st) { st_center_.Push(st); }
+  void OnStatic(const base::Static &st) { st_center_.PushBack(st); }
 
   /**
    * @brief Callback function for receiving market depth data.
    *
    * @param depth The market depth data received.
    */
-  void OnDepth(const base::Depth &depth) { depth_center_.Push(depth); }
+  void OnDepth(const base::Depth &depth) { depth_center_.PushBack(depth); }
 
   /**
    * @brief Callback function for receiving bar data.
    *
    * @param bar The bar data received.
    */
-  void OnBar(const base::Bar &bar) { bar_center_.Push(bar); }
+  void OnBar(const base::Bar &bar) { bar_center_.PushBack(bar); }
 
   /**
    * @brief Callback function for balance update.
    *
    * @param bal The updated balance information.
    */
-  void OnBalance(const base::Balance &bal) { bal_center_.Push(bal); }
+  void OnBalance(const base::Balance &bal) { bal_center_.PushBack(bal); }
 
   /**
    * @brief Returns the static data buffer.

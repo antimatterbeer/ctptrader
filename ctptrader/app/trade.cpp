@@ -3,19 +3,60 @@
 
 namespace ctptrader::app {
 
-void TraderSpi::OnFrontConnected() {}
+void TraderSpi::OnFrontConnected() {
+  ctx_->Logger()->info("Connected to trade front. Sending login request.");
+  CThostFtdcReqUserLoginField req;
+  memset(&req, 0, sizeof(req));
+  strcpy(req.BrokerID, broker_id_.c_str());
+  strcpy(req.UserID, user_id_.c_str());
+  strcpy(req.Password, password_.c_str());
+  if (api_->ReqUserLogin(&req, 0) != 0) {
+    ctx_->Logger()->error("Sending login request failed");
+  } else {
+    ctx_->Logger()->info("Sending login request succeeded");
+  }
+}
 
-void TraderSpi::OnFrontDisconnected(int nReason) {}
+void TraderSpi::OnFrontDisconnected(int nReason) {
+  ctx_->Logger()->info("Disconnected from trade front, reason: {}", nReason);
+}
 
-void TraderSpi::OnHeartBeatWarning(int nTimeLapse) {}
+void TraderSpi::OnHeartBeatWarning(int nTimeLapse) {
+  ctx_->Logger()->info("Heartbeat warning, time lapse: {}", nTimeLapse);
+}
 
 void TraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
                                CThostFtdcRspInfoField *pRspInfo, int nRequestID,
-                               bool bIsLast) {}
+                               bool bIsLast) {
+  if (pRspInfo->ErrorID == 0) {
+
+    ctx_->Logger()->info("Login succeeded. Confirming settlement info");
+    CThostFtdcSettlementInfoConfirmField req;
+    memset(&req, 0, sizeof(req));
+    strcpy(req.BrokerID, broker_id_.c_str());
+    strcpy(req.InvestorID, user_id_.c_str());
+    if (api_->ReqSettlementInfoConfirm(&req, 0) != 0) {
+      ctx_->Logger()->error("Sending settlement info confirm request failed");
+    } else {
+      ctx_->Logger()->info("Sending settlement info confirm request succeeded");
+    }
+  } else {
+    ctx_->Logger()->error("Login failed, error id: {}, error message: {}",
+                          pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+  }
+}
 
 void TraderSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout,
                                 CThostFtdcRspInfoField *pRspInfo,
-                                int nRequestID, bool bIsLast) {}
+                                int nRequestID, bool bIsLast) {
+  if (pRspInfo->ErrorID == 0) {
+    ctx_->Logger()->info("Logout succeeded");
+  } else {
+    ctx_->Logger()->error("Logout failed, error id: {}, error message: {}",
+
+                          pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+  }
+}
 
 void TraderSpi::OnRspSettlementInfoConfirm(
     CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
@@ -23,7 +64,18 @@ void TraderSpi::OnRspSettlementInfoConfirm(
 
 void TraderSpi::OnRspQryTradingAccount(
     CThostFtdcTradingAccountField *pTradingAccount,
-    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {}
+    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+  base::Balance balance{
+      ctx_->AccountCenter().GetID(pTradingAccount->AccountID),
+      pTradingAccount->Available,
+      pTradingAccount->Balance,
+      pTradingAccount->CurrMargin,
+      pTradingAccount->FrozenMargin,
+  };
+  if (!tx_.Write(balance)) {
+    ctx_->Logger()->error("Write balance failed");
+  }
+}
 
 void TraderSpi::OnRspQryInvestorPosition(
     CThostFtdcInvestorPositionField *pInvestorPosition,

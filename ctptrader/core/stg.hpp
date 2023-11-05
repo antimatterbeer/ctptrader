@@ -17,25 +17,57 @@ public:
   virtual void OnBar(const base::Bar &bar) {}
   virtual void OnBalance(const base::Balance &bal) {}
 
+  /**
+   * @brief Sets the context for the strategy.
+   * 
+   * @param ctx A pointer to the context object.
+   */
   void SetContext(Context *ctx) {
     ctx_ = ctx;
-    ins_interests_.assign(ctx->InstrumentCenter().Size(), 0);
-    acc_interests_.assign(ctx->AccountCenter().Size(), 0);
+    ins_interests_.assign(ctx->InstrumentCenter().Count(), 0);
+    acc_interests_.assign(ctx->AccountCenter().Count(), 0);
   }
 
+  /**
+   * @brief Checks if the strategy is currently watching the given instrument.
+   * 
+   * @param id The ID of the instrument to check.
+   * @return true if the strategy is watching the instrument, false otherwise.
+   */
   [[nodiscard]] bool WatchesInstrument(base::InstrumentID id) const {
     return ins_interests_[id] > 0;
   }
 
+  /**
+   * @brief Checks if the strategy is watching the given account.
+   * 
+   * @param id The ID of the account to check.
+   * @return true if the strategy is watching the account, false otherwise.
+   */
   [[nodiscard]] bool WatchesAccount(base::AccountID id) const {
     return acc_interests_[id] > 0;
   }
 
 protected:
+  /**
+   * @brief Get the context object associated with this strategy.
+   * 
+   * @return Context* A pointer to the context object.
+   */
   [[nodiscard]] Context *GetContext() const { return ctx_; }
 
+  /**
+   * @brief Adds an instrument to the list of instruments to be watched by the strategy.
+   * 
+   * @param id The ID of the instrument to be watched.
+   */
   void WatchInstrument(base::InstrumentID id) { ins_interests_[id] = 1; }
 
+  /**
+   * @brief Adds the specified account ID to the list of accounts to watch for updates.
+   *
+   * @param id The ID of the account to watch.
+   */
   void WatchAccount(base::AccountID id) { acc_interests_[id] = 1; }
 
 private:

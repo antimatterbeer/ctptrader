@@ -54,11 +54,22 @@ struct alignas(8) Depth {
 static_assert(sizeof(Depth) == 192);
 
 struct alignas(8) Balance {
-  AccountID id_;    // +4 bytes
-  Money balance_;   // +8 bytes
-  Money available_; // +8 bytes
+  AccountID id_;        // +4 bytes
+  Money balance_;       // +8 bytes
+  Money available_;     // +8 bytes
+  Money cur_margin_;    // +8 bytes
+  Money frozen_margin_; // +8 bytes
 };
-static_assert(sizeof(Balance) == 24);
+static_assert(sizeof(Balance) == 40);
+
+struct alignas(8) Trade {
+  InstrumentID id_;       // +4 bytes
+  Timestamp update_time_; // +16 bytes
+  Price price_;           // +8 bytes
+  Volume volume_;         // +4 bytes
+  Direction direction_;   // +4 bytes
+};
+static_assert(sizeof(Trade) == 40);
 
 struct alignas(8) NewOrder {
   Timestamp create_time_; // +16 bytes
