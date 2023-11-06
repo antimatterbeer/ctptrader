@@ -96,6 +96,16 @@ void TraderSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {}
 
 void TraderSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {}
 
+void TraderSpi::OnNewOrder(base::NewOrder &req) {
+  CThostFtdcInputOrderField order;
+  api_->ReqOrderInsert(&order, 0);
+}
+
+void TraderSpi::OnCancelOrder(base::CancelOrder &req) {
+  CThostFtdcInputOrderActionField order;
+  api_->ReqOrderAction(&order, 0);
+}
+
 bool TradeManager::Init(toml::table &global_config, toml::table &app_config) {
   auto data_folder = global_config["data_folder"].value_or("");
   if (!ctx_.Init(data_folder)) {
@@ -122,6 +132,7 @@ void TradeManager::Run() {
     base::Msg msg;
     while (!stop_) {
       if (rx.Read(msg)) {
+
         /* TODO */
       }
     }

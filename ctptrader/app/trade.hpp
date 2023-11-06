@@ -62,6 +62,10 @@ public:
 
   void OnRtnTrade(CThostFtdcTradeField *pTrade) override;
 
+  void OnNewOrder(base::NewOrder &req);
+
+  void OnCancelOrder(base::CancelOrder &req);
+
   void Start();
 
 private:
