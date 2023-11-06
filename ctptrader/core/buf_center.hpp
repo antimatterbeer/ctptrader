@@ -10,11 +10,11 @@ namespace ctptrader::core {
 
 /**
  * @brief A circular buffer that stores data of type T with a fixed size N for
- * each instrument ID.
+ * each ID.
  *
  * @tparam T The type of data to be stored in the buffer. It must have an int
- * field instrument_id_.
- * @tparam N The fixed size of the circular buffer for each instrument ID.
+ * field id_.
+ * @tparam N The fixed size of the circular buffer for each ID.
  */
 template <typename T, size_t N> class BufCenter {
   static_assert(std::is_same<decltype(T::id_), base::ID>::value,

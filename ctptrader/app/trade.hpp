@@ -11,11 +11,11 @@ namespace ctptrader::app {
 class TraderSpi : public CThostFtdcTraderSpi {
 public:
   TraderSpi(core::Context *ctx, CThostFtdcTraderApi *api,
-            std::string_view trade_channel, std::string_view broker_id,
+            std::string_view rsp_channel, std::string_view broker_id,
             std::string_view user_id, std::string_view password)
       : ctx_(ctx)
       , api_(api)
-      , tx_(trade_channel)
+      , tx_(rsp_channel)
       , broker_id_(broker_id)
       , user_id_(user_id)
       , password_(password) {}
@@ -62,6 +62,8 @@ public:
 
   void OnRtnTrade(CThostFtdcTradeField *pTrade) override;
 
+  void Start();
+
 private:
   core::Context *ctx_;
   CThostFtdcTraderApi *api_;
@@ -73,20 +75,23 @@ private:
 
 class TradeManager : public core::IApp {
 public:
-  TradeManager(std::string_view trade_channel)
-      : trade_channel_(trade_channel) {}
+  TradeManager(std::string_view req_channel, std::string_view rsp_channel)
+      : req_channel_(req_channel)
+      , rsp_channel_(rsp_channel) {}
 
   bool Init(toml::table &global_config, toml::table &app_config) override;
 
   void Run() override;
 
 private:
-  const std::string trade_channel_;
+  const std::string req_channel_;
+  const std::string rsp_channel_;
   core::Context ctx_;
   std::string broker_id_;
   std::string user_id_;
   std::string password_;
   std::string trade_front_;
+  bool stop_ = false;
 };
 
 } // namespace ctptrader::app

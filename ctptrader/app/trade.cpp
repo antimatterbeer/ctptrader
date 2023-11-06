@@ -115,7 +115,18 @@ bool TradeManager::Init(toml::table &global_config, toml::table &app_config) {
 void TradeManager::Run() {
   auto front_address = fmt::format("tcp://{}", trade_front_);
   CThostFtdcTraderApi *api = CThostFtdcTraderApi::CreateFtdcTraderApi();
-  TraderSpi spi(&ctx_, api, trade_channel_, broker_id_, user_id_, password_);
+  TraderSpi spi(&ctx_, api, rsp_channel_, broker_id_, user_id_, password_);
+
+  std::thread t([&]() {
+    util::ShmSpscReader<base::Msg, 20> rx(rsp_channel_);
+    base::Msg msg;
+    while (!stop_) {
+      if (rx.Read(msg)) {
+        /* TODO */
+      }
+    }
+  });
+
   api->RegisterSpi(&spi);
   api->RegisterFront((char *)front_address.c_str());
   api->Init();
