@@ -17,7 +17,8 @@ public:
 
   void Run() override;
 
-  void operator()(const base::Static &st) {
+private:
+  void OnStatic(const base::Static &st) {
     for (auto &s : stgs_) {
       if (s.Instance().WatchesInstrument(st.id_)) {
         s.Instance().OnStatic(st);
@@ -26,7 +27,7 @@ public:
     ctx_.OnStatic(st);
   }
 
-  void operator()(const base::Bar &bar) {
+  void OnBar(const base::Bar &bar) {
     for (auto &s : stgs_) {
       if (s.Instance().WatchesInstrument(bar.id_)) {
         s.Instance().OnBar(bar);
@@ -35,7 +36,7 @@ public:
     ctx_.OnBar(bar);
   }
 
-  void operator()(const base::Depth &depth) {
+  void OnDepth(const base::Depth &depth) {
     for (auto &s : stgs_) {
       if (s.Instance().WatchesInstrument(depth.id_)) {
         s.Instance().OnDepth(depth);
@@ -44,7 +45,7 @@ public:
     ctx_.OnDepth(depth);
   }
 
-  void operator()(const base::Balance &bal) {
+  void OnBalance(const base::Balance &bal) {
     for (auto &s : stgs_) {
       if (s.Instance().WatchesAccount(bal.id_)) {
         s.Instance().OnBalance(bal);

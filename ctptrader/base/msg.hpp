@@ -62,15 +62,6 @@ struct alignas(8) Balance {
 };
 static_assert(sizeof(Balance) == 40);
 
-struct alignas(8) Trade {
-  InstrumentID id_;       // +4 bytes
-  Timestamp update_time_; // +16 bytes
-  Price price_;           // +8 bytes
-  Volume volume_;         // +4 bytes
-  Direction direction_;   // +4 bytes
-};
-static_assert(sizeof(Trade) == 40);
-
 struct alignas(8) NewOrder {
   Timestamp create_time_; // +16 bytes
   ID instrument_id_;      // +4 bytes
@@ -100,6 +91,16 @@ struct alignas(8) OrderUpdate {
   Volume pulled_volume_;  // +4 bytes
 };
 
-using Msg = std::variant<Bar, Static, Depth, Balance>;
+struct alignas(8) Trade {
+  InstrumentID id_;       // +4 bytes
+  Timestamp update_time_; // +16 bytes
+  Price price_;           // +8 bytes
+  Volume volume_;         // +4 bytes
+  Direction direction_;   // +4 bytes
+};
+static_assert(sizeof(Trade) == 40);
+
+using Msg = std::variant<Bar, Static, Depth, Balance, NewOrder, CancelOrder,
+                         OrderUpdate, Trade>;
 
 } // namespace ctptrader::base

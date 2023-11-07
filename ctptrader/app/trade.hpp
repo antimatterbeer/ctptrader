@@ -62,11 +62,12 @@ public:
 
   void OnRtnTrade(CThostFtdcTradeField *pTrade) override;
 
+  void OnMsg(base::Msg &msg);
+
+private:
   void OnNewOrder(base::NewOrder &req);
 
   void OnCancelOrder(base::CancelOrder &req);
-
-  void Start();
 
 private:
   core::Context *ctx_;
@@ -75,6 +76,7 @@ private:
   const std::string broker_id_;
   const std::string user_id_;
   const std::string password_;
+  bool stop_ = false;
 };
 
 class TradeManager : public core::IApp {

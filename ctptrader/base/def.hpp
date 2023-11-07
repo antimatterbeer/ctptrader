@@ -39,6 +39,9 @@ using Mutiple = int;
 /// @brief Ratio type
 using Ratio = double;
 
+/// @brief Value type
+using Value = double;
+
 /// @brief 交易所
 enum Exchange {
   Exchange_Invalid = -1,

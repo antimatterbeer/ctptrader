@@ -92,6 +92,19 @@ void TraderSpi::OnRspOrderAction(
 void TraderSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID,
                            bool bIsLast) {}
 
+void TraderSpi::OnMsg(base::Msg &msg) {
+  std::visit(
+      [this](auto &&arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, base::NewOrder>) {
+          OnNewOrder(arg);
+        } else if constexpr (std::is_same_v<T, base::CancelOrder>) {
+          OnCancelOrder(arg);
+        }
+      },
+      msg);
+}
+
 void TraderSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {}
 
 void TraderSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {}
@@ -132,8 +145,7 @@ void TradeManager::Run() {
     base::Msg msg;
     while (!stop_) {
       if (rx.Read(msg)) {
-
-        /* TODO */
+        spi.OnMsg(msg);
       }
     }
   });
