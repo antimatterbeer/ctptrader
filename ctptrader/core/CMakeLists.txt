@@ -7,4 +7,5 @@ add_library(${LIB_NAME} STATIC
     stg.cpp
     app.cpp
     factor.cpp
+    reader.cpp
 )
