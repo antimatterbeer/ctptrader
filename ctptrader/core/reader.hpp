@@ -8,23 +8,18 @@
 
 namespace ctptrader::core {
 
-template <typename T>
-concept HasUpdateTime = requires(T t) {
-  { t.update_time_ } -> std::same_as<base::Timestamp>;
-};
-
 class IReader {
 public:
   class Compare {
   public:
     bool operator()(const IReader *lhs, const IReader *rhs) const noexcept {
-      return lhs->NextUpdateTime() > rhs->NextUpdateTime();
+      return lhs->PeekTimestamp() > rhs->PeekTimestamp();
     }
   };
   virtual ~IReader() = default;
-  [[nodiscard]] virtual base::Timestamp NextUpdateTime() const = 0;
+  [[nodiscard]] virtual base::Timestamp PeekTimestamp() const = 0;
   [[nodiscard]] virtual bool Empty() const = 0;
-  [[nodiscard]] virtual base::Msg Read() = 0;
+  [[nodiscard]] virtual base::Msg Pop() = 0;
 };
 
 class MsgIter {
@@ -33,7 +28,7 @@ public:
   [[nodiscard]] base::Msg Next() {
     auto reader = readers_.top();
     readers_.pop();
-    auto msg = reader->Read();
+    auto msg = reader->Pop();
     if (reader->Empty()) {
       delete reader;
     } else {
