@@ -11,6 +11,5 @@ target_link_libraries(${PROJECT_NAME}
     coreLib 
     appLib
     Boost::system
-    ${THIRDPARTY}/ctp/lib/libthostmduserapi_se.so
-    ${THIRDPARTY}/ctp/lib/libthosttraderapi_se.so
+    ${CTP_LIBRARIES}
 )

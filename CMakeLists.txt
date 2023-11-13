@@ -4,7 +4,7 @@ project(ctptrader)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-std=c++20 -fPIC -Wall -Werror -Wno-unused-function -Wno-sign-compare -Wno-write-strings -pedantic -pthread")
+set(CMAKE_CXX_FLAGS "-std=c++20 -fPIC -Wall -Werror -Wextra -pedantic -pthread")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -DNDEBUG")
 
@@ -17,14 +17,7 @@ find_package(CURL REQUIRED)
 
 # third party
 set(THIRDPARTY ${CMAKE_SOURCE_DIR}/thirdparty)
-include_directories(${THIRDPARTY}/csv-parser/include)
-include_directories(${THIRDPARTY}/spdlog/include)
-include_directories(${THIRDPARTY}/tomlplusplus/include)
-include_directories(${THIRDPARTY}/fmt/include)
-include_directories(${THIRDPARTY}/rapidjson/include)
-include_directories(${THIRDPARTY}/cmdline/include)
-include_directories(${THIRDPARTY}/tomlplusplus/include)
-include_directories(${THIRDPARTY}/ctp/include)
+include(${THIRDPARTY}/CMakeLists.txt)
 
 enable_testing()
 

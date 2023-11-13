@@ -11,7 +11,7 @@ bool RefCenter<base::Account>::LoadFromCsv(std::string_view filename) {
   util::CsvReader<3> reader(filename);
   base::Account account;
   while (reader.ReadRow(account.id_, account.name_, account.alias_)) {
-    if (account.id_ != vec_.size()) {
+    if (account.id_ != (int)vec_.size()) {
       std::cerr << "Account id mismatch: " << account.id_ << std::endl;
       return false;
     }
@@ -27,7 +27,7 @@ bool RefCenter<base::Underlying>::LoadFromCsv(std::string_view filename) {
   base::Underlying u;
   while (reader.ReadRow(u.id_, u.name_, u.exchange_, u.multiple_, u.lot_size_,
                         u.tick_size_)) {
-    if (u.id_ != vec_.size()) {
+    if (u.id_ != (int)vec_.size()) {
       std::cerr << "ID is not continuous.\n";
       return false;
     }
@@ -44,7 +44,7 @@ bool RefCenter<base::Instrument>::LoadFromCsv(std::string_view filename) {
   while (reader.ReadRow(i.id_, i.name_, i.underlying_, i.type_, i.create_date_,
                         i.expire_date_, i.long_margin_ratio_,
                         i.short_margin_ratio_)) {
-    if (i.id_ != vec_.size()) {
+    if (i.id_ != (int)vec_.size()) {
       std::cerr << "Instrument id mismatch: " << i.id_ << std::endl;
       return false;
     }
@@ -73,7 +73,7 @@ bool RefCenter<base::CalendarDate>::LoadFromCsv(std::string_view filename) {
   }
   base::CalendarDate date;
   for (auto &r : cache) {
-    if (r.id_ != vec_.size()) {
+    if (r.id_ != (int)vec_.size()) {
       std::cerr << "Date id mismatch: " << r.id_ << std::endl;
       return false;
     }
