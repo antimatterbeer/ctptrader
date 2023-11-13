@@ -31,19 +31,19 @@ public:
   }
 
   void OnStatic(const base::Static &st) override {
-    GetContext()->Logger()->info("On static");
+    GetContext()->Logger()->info("On static. Instrument: {}", st.id_);
   }
 
   void OnDepth(const base::Depth &depth) override {
-    GetContext()->Logger()->info("On depth");
+    GetContext()->Logger()->info("On depth. Instrument: {}", depth.id_);
   }
 
   void OnBar(const base::Bar &bar) override {
-    GetContext()->Logger()->info("On bar");
+    GetContext()->Logger()->info("On bar. Instrument: {}", bar.id_);
   }
 
   void OnBalance(const base::Balance &bal) override {
-    GetContext()->Logger()->info("On balance");
+    GetContext()->Logger()->info("On balance. Account: {}", bal.id_);
   }
 };
 

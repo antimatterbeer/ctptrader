@@ -21,9 +21,15 @@ TEST(RefCenter, LoadFromCsv) {
 
 TEST(BufCenter, PushBack) {
   core::BufCenter<base::Balance, 2> bc;
+  base::Balance b{};
+  b.id_ = 0;
   bc.Resize(10);
-  bc.PushBack(base::Balance(0, 1000, 1000));
-  bc.PushBack(base::Balance(0, 1100, 1100));
+  b.balance_ = 1000;
+  b.available_ = 1000;
+  bc.PushBack(b);
+  b.balance_ = 1100;
+  b.available_ = 1100;
+  bc.PushBack(b);
   EXPECT_EQ(bc.Count(), 10);
   EXPECT_EQ(bc.Size(0), 2);
   EXPECT_EQ(bc.Back(0).available_, 1100);
