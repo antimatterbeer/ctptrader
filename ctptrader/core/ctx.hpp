@@ -1,16 +1,238 @@
 #pragma once
 
+#include <concepts>
 #include <string_view>
 
+#include <boost/circular_buffer.hpp>
 #include <spdlog/spdlog.h>
 #include <toml.hpp>
 
 #include <base/msg.hpp>
 #include <base/ref.hpp>
-#include <core/buf_center.hpp>
-#include <core/ref_center.hpp>
 
 namespace ctptrader::core {
+
+template <typename T>
+concept HasID = requires(T t) {
+  { t.id_ } -> std::convertible_to<base::ID>;
+};
+
+template <typename T>
+concept HasNameAndID = requires(T t) {
+  { t.id_ } -> std::convertible_to<base::ID>;
+  { t.name_ } -> std::convertible_to<std::string_view>;
+};
+
+/**
+ * @brief A circular buffer that stores data of type T with a fixed size N for
+ * each ID.
+ *
+ * @tparam T The type of data to be stored in the buffer. It must have an int
+ * field id_.
+ * @tparam N The fixed size of the circular buffer for each ID.
+ */
+template <HasID T, size_t N> class BufCenter {
+public:
+  /**
+   * @brief Resizes the buffer to the specified size.
+   *
+   * @param size The new size of the buffer.
+   */
+  void Resize(size_t size) {
+    chunks_.resize(size, boost::circular_buffer<T>(N));
+  }
+
+  /**
+   * @brief Checks if a value with the given ID exists in the buffer.
+   *
+   * @param id The ID of the value to check for.
+   * @return true if a value with the given ID exists in the buffer, false
+   * otherwise.
+   */
+  [[nodiscard]] bool HasValue(base::ID id) const {
+    return chunks_[id].size() > 0;
+  }
+
+  /**
+   * @brief Checks if there is a previous element in the buffer for the given
+   * ID.
+   *
+   * @param id The ID to check for a previous element.
+   * @return True if there is a previous element, false otherwise.
+   */
+  [[nodiscard]] bool HasPrev(base::ID id) const {
+    return chunks_[id].size() > 1;
+  }
+
+  /**
+   * @brief Pushes a value into the buffer with the corresponding ID.
+   *
+   * @param value The value to be pushed into the buffer.
+   */
+  void PushBack(const T &value) { chunks_[value.id_].push_back(value); }
+
+  /**
+   * @brief Returns a reference to the last element in the buffer with the
+   * specified ID.
+   *
+   * @param id The ID of the buffer to retrieve the last element from.
+   * @return const T& A reference to the last element in the buffer.
+   */
+  [[nodiscard]] const T &Back(base::ID id) const { return chunks_[id].back(); }
+
+  /**
+   * Returns a const reference to the previous element in the buffer for the
+   * given ID.
+   *
+   * @param id The ID of the element to get the previous element for.
+   * @return A const reference to the previous element in the buffer for the
+   * given ID.
+   */
+  [[nodiscard]] const T &Prev(base::ID id) const {
+    return chunks_[id][chunks_[id].size() - 2];
+  }
+
+  /**
+   * @brief Returns a const reference to the nth element in the buffer with the
+   * given ID.
+   *
+   * @param id The ID of the buffer to get the nth element from.
+   * @param n The index of the element to get.
+   * @return A const reference to the nth element in the buffer with the given
+   * ID.
+   */
+  [[nodiscard]] const T &Nth(base::ID id, size_t n) const {
+    return chunks_[id][n];
+  }
+
+  /**
+   * @brief Returns a const reference to the nth element in the buffer with the
+   * given ID, counting from the back.
+   *
+   * @param id The ID of the buffer to get the nth element from.
+   * @param n The index of the element to get, counting from the back.
+   * @return A const reference to the nth element in the buffer with the given
+   * ID, counting from the back.
+   */
+  [[nodiscard]] const T &ReverseNth(base::ID id, size_t n) const {
+    return chunks_[id][chunks_[id].size() - n - 1];
+  }
+
+  /**
+   * @brief Returns the size of the buffer with the given ID.
+   *
+   * @param id The ID of the buffer to get the size of.
+   * @return The size of the buffer with the given ID.
+   */
+  [[nodiscard]] size_t Size(base::ID id) const { return chunks_[id].size(); }
+
+  /**
+   * @brief Returns the maximum number of elements that the buffer can hold.
+   *
+   * @return The maximum number of elements that the buffer can hold.
+   */
+  [[nodiscard]] size_t Capacity() const { return N; }
+
+  /**
+   * @brief Returns the number of chunks in the buffer center.
+   *
+   * @return The number of chunks in the buffer center.
+   */
+  [[nodiscard]] size_t Count() const { return chunks_.size(); }
+
+private:
+  std::vector<boost::circular_buffer<T>> chunks_;
+};
+
+/**
+ * @brief A class template for managing a collection of data objects with unique
+ * IDs and names.
+ *
+ * @tparam T The type of data object to manage. It must have an int field id_
+ * and a string field name_.
+ */
+template <HasNameAndID T> class RefCenter {
+
+public:
+  /**
+   * @brief Checks if the given ID is valid.
+   *
+   * @param id The ID to check.
+   * @return true if the ID is valid, false otherwise.
+   */
+  bool HasID(base::ID id) const { return id > 0 && id < Count(); }
+
+  /**
+   * Checks if a reference with the given name exists in the reference center.
+   *
+   * @param name The name of the reference to check for.
+   * @return True if a reference with the given name exists, false otherwise.
+   */
+  bool HasName(const std::string &name) const {
+    return id_map_.count(name) > 0;
+  }
+
+  /**
+   * @brief Retrieves the ID associated with the given name.
+   *
+   * @param name The name to retrieve the ID for.
+   * @return The ID associated with the given name.
+   */
+  base::ID GetID(const std::string &name) const {
+    auto it = id_map_.find(name);
+    if (it == id_map_.end()) {
+      return -1;
+    } else {
+      return it->second;
+    }
+  }
+
+  /**
+   * @brief Returns a constant reference to the object with the specified ID.
+   *
+   * @param id The ID of the object to retrieve.
+   * @return const T& A constant reference to the object with the specified ID.
+   */
+  const T &Get(base::ID id) const { return vec_[id]; }
+
+  /**
+   * @brief Returns a reference to the object with the specified name.
+   *
+   * This function retrieves the object with the specified name from the
+   * reference center and returns a reference to it. If the object does not
+   * exist, a std::out_of_range exception is thrown.
+   *
+   * @param name The name of the object to retrieve.
+   * @return const T& A reference to the object with the specified name.
+   * @throws std::out_of_range If the object with the specified name does not
+   * exist.
+   */
+  const T &Get(const std::string &name) const { return Get(GetID(name)); }
+
+  /**
+   * Returns the number of elements in the vector.
+   *
+   * @return The number of elements in the vector.
+   */
+  int Count() const { return vec_.size(); }
+
+  /**
+   * @brief Loads data from a CSV file.
+   *
+   * This function reads data from a CSV file with the given filename and loads
+   * it into the reference center.
+   *
+   * @param filename The name of the CSV file to load.
+   * @return True if the data was successfully loaded, false otherwise.
+   */
+  bool LoadFromCsv(std::string_view filename);
+
+  friend class Context;
+
+private:
+  std::vector<T> vec_;
+  std::unordered_map<std::string, base::ID> id_map_;
+};
 
 /**
  * @brief The Context class represents the trading context, which contains
