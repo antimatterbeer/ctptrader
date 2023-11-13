@@ -158,13 +158,14 @@ public:
   }
 } __attribute__((packed));
 
-static Timestamp GetTimestamp() {
+[[maybe_unused]] static Timestamp GetTimestamp() {
   Timestamp ts;
   clock_gettime(CLOCK_REALTIME, &ts);
   return ts;
 }
 
-static void ToLocalTime(const Timestamp &ts_, struct tm &result_) {
+[[maybe_unused]] static void ToLocalTime(const Timestamp &ts_,
+                                         struct tm &result_) {
   ::localtime_r(&ts_.tv_sec, &result_);
 }
 

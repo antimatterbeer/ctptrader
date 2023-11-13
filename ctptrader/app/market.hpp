@@ -81,6 +81,7 @@ private:
   std::vector<int> received_;
   base::Depth depth_;
   base::Static static_;
+  int request_id_{0};
 };
 
 class MarketManager : public core::IApp {
