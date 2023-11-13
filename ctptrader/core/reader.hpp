@@ -1,6 +1,5 @@
 #pragma once
 
-#include <concepts>
 #include <queue>
 
 #include <base/msg.hpp>
@@ -26,9 +25,9 @@ class MsgIter {
 public:
   [[nodiscard]] bool Empty() const { return readers_.empty(); }
   [[nodiscard]] base::Msg Next() {
-    auto reader = readers_.top();
+    const auto reader = readers_.top();
     readers_.pop();
-    auto msg = reader->Pop();
+    const auto msg = reader->Pop();
     if (reader->Empty()) {
       delete reader;
     } else {

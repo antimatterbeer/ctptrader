@@ -8,9 +8,9 @@
 
 namespace ctptrader::app {
 
-class StrategyManager : public core::IApp {
+class StrategyManager final : public core::IApp {
 public:
-  StrategyManager(std::string_view market_channel)
+  explicit StrategyManager(const std::string_view market_channel)
       : md_rx_(market_channel) {}
 
   bool Init(toml::table &global_config, toml::table &app_config) override;

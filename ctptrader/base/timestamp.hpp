@@ -2,9 +2,9 @@
 
 #include <compare>
 #include <cstring>
+#include <ctime>
 #include <string>
 #include <string_view>
-#include <time.h>
 
 namespace ctptrader::base {
 
@@ -19,7 +19,7 @@ static constexpr long NANOSINMICRO = 1000L;
 
 class Timestamp : public timespec {
 public:
-  std::string ToString() const {
+  [[nodiscard]] std::string ToString() const {
     char buf[32];
     struct tm t;
     localtime_r(&tv_sec, &t);
@@ -29,7 +29,7 @@ public:
     return buf;
   }
 
-  std::string ToDate() const {
+  [[nodiscard]] std::string ToDate() const {
     char buf[32];
     struct tm t;
     localtime_r(&tv_sec, &t);
@@ -37,7 +37,7 @@ public:
     return buf;
   }
 
-  std::string ToTime() const {
+  [[nodiscard]] std::string ToTime() const {
     char buf[32];
     struct tm t;
     localtime_r(&tv_sec, &t);
@@ -46,7 +46,7 @@ public:
     return buf;
   }
 
-  bool IsEmpty() const { return tv_sec == 0 && tv_nsec == 0; }
+  [[nodiscard]] bool IsEmpty() const { return tv_sec == 0 && tv_nsec == 0; }
   void clear() { tv_sec = tv_nsec = 0; }
 
   // operators

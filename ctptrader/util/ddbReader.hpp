@@ -4,8 +4,9 @@
 
 #define FMT_HEADER_ONLY
 #include <DolphinDB.h>
-#include <Util.h>
-#include <fmt/format.h>
+
+#include <base/date.hpp>
+#include <base/timestamp.hpp>
 
 namespace ctptrader::util {
 
@@ -15,7 +16,7 @@ using dolphindb::TableSP;
 
 template <uint8_t N> class TableReader {
 public:
-  TableReader(TableSP table)
+  explicit TableReader(const TableSP &table)
       : row_count_(table->rows()) {
     for (size_t i = 0; i < N; ++i) {
       cols_.push_back(table->getColumn(i));
@@ -37,22 +38,29 @@ public:
   }
 
 private:
-  void ReadCell(size_t idx) {}
+  void ReadCell(size_t idx) const {}
 
   template <typename T, typename... Types>
-  void ReadCell(size_t idx, T &t, Types &...args) {
+  void ReadCell(size_t idx, T &t, Types &...args) const{
     Get(idx, t);
     ReadCell(idx + 1, args...);
   }
 
-  void Get(size_t idx, char &value) { value = cols_[idx]->getChar(row_idx_); }
-  void Get(size_t idx, bool &value) { value = cols_[idx]->getBool(row_idx_); }
-  void Get(size_t idx, int &value) { value = cols_[idx]->getInt(row_idx_); }
-  void Get(size_t idx, long &value) { value = cols_[idx]->getLong(row_idx_); }
-  void Get(size_t idx, float &value) { value = cols_[idx]->getFloat(row_idx_); }
-  void Get(size_t idx, double &value) {
-    value = cols_[idx]->getDouble(row_idx_);
-  }
+  void Get(size_t i, char &v) const { v = cols_[i]->getChar(row_idx_); }
+
+  void Get(size_t i, bool &v) const { v = cols_[i]->getBool(row_idx_); }
+
+  void Get(size_t i, int &v) const { v = cols_[i]->getInt(row_idx_); }
+
+  void Get(size_t i, long &v) const { v = cols_[i]->getLong(row_idx_); }
+
+  void Get(size_t i, float &v) const { v = cols_[i]->getFloat(row_idx_); }
+
+  void Get(size_t i, double &v) const { v = cols_[i]->getDouble(row_idx_); }
+
+  void Get(size_t i, base::Date &v) const {}
+
+  void Get(size_t i, base::Timestamp &v) const {}
 
 private:
   size_t row_count_;

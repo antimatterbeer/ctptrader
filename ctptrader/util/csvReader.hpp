@@ -12,7 +12,7 @@ namespace ctptrader::util {
 
 template <int N> class CsvReader {
 public:
-  explicit CsvReader(std::string_view path)
+  explicit CsvReader(const std::string_view path)
       : reader_(path) {}
   ~CsvReader() = default;
 
@@ -26,102 +26,74 @@ public:
   }
 
 private:
-  void ReadCell(size_t) {}
+  void ReadCell(size_t) const {}
 
   template <typename T, typename... ColTypes>
-  void ReadCell(size_t i, T &t, ColTypes &...args) {
+  void ReadCell(size_t i, T &t, ColTypes &...args) const {
     Read(i, t);
     ReadCell(i + 1, args...);
   }
-  void Read(size_t i, bool &v);
-  void Read(size_t i, int &v);
-  void Read(size_t i, long &v);
-  void Read(size_t i, float &v);
-  void Read(size_t i, double &v);
-  void Read(size_t i, std::string &v);
-  void Read(size_t i, base::Exchange &v);
-  void Read(size_t i, base::InstrumentType &v);
-  void Read(size_t i, base::Direction &v);
-  void Read(size_t i, base::PriceType &v);
-  void Read(size_t i, base::OrderStatus &v);
-  void Read(size_t i, base::Currency &v);
-  void Read(size_t i, base::Date &v);
-  void Read(size_t i, base::Timestamp &v);
+  void Read(size_t i, bool &v) const { v = row_[i].get<bool>(); }
+
+  void Read(size_t i, int &v) const { v = row_[i].get<int>(); }
+
+  void Read(size_t i, long &v) const { v = row_[i].get<long>(); }
+
+  void Read(size_t i, float &v) const { v = row_[i].get<float>(); }
+
+  void Read(size_t i, double &v) const { v = row_[i].get<double>(); }
+
+  void Read(size_t i, std::string &v) const { v = row_[i].get<std::string>(); }
+
+  void Read(size_t i, base::Exchange &v) const {
+    auto s = row_[i].get<std::string>();
+    auto it = base::ExchangeMap.find(s);
+    v = it == base::ExchangeMap.end() ? base::Exchange_Invalid : it->second;
+  }
+
+  void Read(size_t i, base::InstrumentType &v) const {
+    auto s = row_[i].get<std::string>();
+    auto it = base::InstrumentTypeMap.find(s);
+    v = it == base::InstrumentTypeMap.end() ? base::InstrumentType_Invalid
+                                            : it->second;
+  }
+
+  void Read(size_t i, base::Direction &v) const {
+    auto s = row_[i].get<std::string>();
+    auto it = base::DirectionMap.find(s);
+    v = it == base::DirectionMap.end() ? base::Direction_Invalid : it->second;
+  }
+
+  void Read(size_t i, base::PriceType &v) const {
+    auto s = row_[i].get<std::string>();
+    auto it = base::PriceTypeMap.find(s);
+    v = it == base::PriceTypeMap.end() ? base::PriceType_Invalid : it->second;
+  }
+
+  void Read(size_t i, base::OrderStatus &v) const {
+    auto s = row_[i].get<std::string>();
+    auto it = base::OrderStatusMap.find(s);
+    v = it == base::OrderStatusMap.end() ? base::OrderStatus_Invalid
+                                         : it->second;
+  }
+
+  void Read(size_t i, base::Currency &v) const {
+    auto s = row_[i].get<std::string>();
+    auto it = base::CurrencyMap.find(s);
+    v = it == base::CurrencyMap.end() ? base::Currency_Invalid : it->second;
+  }
+
+  void Read(size_t i, base::Date &v) const {
+    v = base::Date(row_[i].get<int>());
+  }
+
+  void Read(size_t i, base::Timestamp &v) const {
+    v = base::Timestamp::FromMilliSeconds(row_[i].get<long>());
+  }
 
 private:
   csv::CSVReader reader_;
   csv::CSVRow row_;
 };
-
-template <int N> inline void CsvReader<N>::Read(size_t i, bool &v) {
-  v = row_[i].get<bool>();
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, int &v) {
-  v = row_[i].get<int>();
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, long &v) {
-  v = row_[i].get<long>();
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, float &v) {
-  v = row_[i].get<float>();
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, double &v) {
-  v = row_[i].get<double>();
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, std::string &v) {
-  v = row_[i].get<std::string>();
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, base::Exchange &v) {
-  auto s = row_[i].get<std::string>();
-  auto it = base::ExchangeMap.find(s);
-  v = it == base::ExchangeMap.end() ? base::Exchange_Invalid : it->second;
-}
-
-template <int N>
-inline void CsvReader<N>::Read(size_t i, base::InstrumentType &v) {
-  auto s = row_[i].get<std::string>();
-  auto it = base::InstrumentTypeMap.find(s);
-  v = it == base::InstrumentTypeMap.end() ? base::InstrumentType_Invalid
-                                          : it->second;
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, base::Direction &v) {
-  auto s = row_[i].get<std::string>();
-  auto it = base::DirectionMap.find(s);
-  v = it == base::DirectionMap.end() ? base::Direction_Invalid : it->second;
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, base::PriceType &v) {
-  auto s = row_[i].get<std::string>();
-  auto it = base::PriceTypeMap.find(s);
-  v = it == base::PriceTypeMap.end() ? base::PriceType_Invalid : it->second;
-}
-
-template <int N>
-inline void CsvReader<N>::Read(size_t i, base::OrderStatus &v) {
-  auto s = row_[i].get<std::string>();
-  auto it = base::OrderStatusMap.find(s);
-  v = it == base::OrderStatusMap.end() ? base::OrderStatus_Invalid : it->second;
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, base::Currency &v) {
-  auto s = row_[i].get<std::string>();
-  auto it = base::CurrencyMap.find(s);
-  v = it == base::CurrencyMap.end() ? base::Currency_Invalid : it->second;
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, base::Date &v) {
-  v = base::Date(row_[i].get<int>());
-}
-
-template <int N> inline void CsvReader<N>::Read(size_t i, base::Timestamp &v) {
-  v = base::Timestamp::FromMilliSeconds(row_[i].get<long>());
-}
 
 } // namespace ctptrader::util

@@ -15,11 +15,11 @@
 
 namespace ctptrader::app {
 
-class MdSpi : public CThostFtdcMdSpi {
+class MdSpi final : public CThostFtdcMdSpi {
 public:
   MdSpi(core::Context *ctx, CThostFtdcMdApi *api,
-        std::string_view market_channel, std::string_view broker_id,
-        std::string_view user_id, std::string_view password)
+        const std::string_view market_channel, const std::string_view broker_id,
+        const std::string_view user_id, const std::string_view password)
       : ctx_(ctx)
       , api_(api)
       , tx_(market_channel)
@@ -27,7 +27,7 @@ public:
       , user_id_(user_id)
       , password_(password) {}
 
-  ~MdSpi() {}
+  ~MdSpi() = default;
 
   void OnFrontConnected() override;
 
@@ -86,7 +86,7 @@ private:
 
 class MarketManager : public core::IApp {
 public:
-  MarketManager(std::string_view market_channel)
+  explicit MarketManager(const std::string_view market_channel)
       : market_channel_(market_channel) {}
 
   bool Init(toml::table &global_config, toml::table &app_config) override {
@@ -115,12 +115,12 @@ public:
   }
 
   void Run() override {
-    auto front_address = fmt::format("tcp://{}", market_front_);
+    const auto front_address = fmt::format("tcp://{}", market_front_);
     auto *api = CThostFtdcMdApi::CreateFtdcMdApi();
     MdSpi spi(&ctx_, api, market_channel_, broker_id_, user_id_, password_);
     spi.SetInterests(instruments_);
     api->RegisterSpi(&spi);
-    api->RegisterFront((char *)front_address.c_str());
+    api->RegisterFront(const_cast<char *>(front_address.c_str()));
     api->Init();
     api->Join();
     api->Release();

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string_view>
-
 #include <boost/noncopyable.hpp>
 
 #include <core/ctx.hpp>
@@ -13,6 +11,8 @@ namespace ctptrader::core {
  */
 class IApp : public boost::noncopyable {
 public:
+  virtual ~IApp() = default;
+
   /**
    * @brief Initializes the application.
    * @param global_config The global configuration.
@@ -27,7 +27,7 @@ public:
   virtual void Run() = 0;
 
 protected:
-  core::Context ctx_; /**< The context of the application. */
+  Context ctx_; /**< The context of the application. */
 };
 
 }; // namespace ctptrader::core

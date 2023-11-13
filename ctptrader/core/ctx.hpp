@@ -131,7 +131,7 @@ public:
    *
    * @return The maximum number of elements that the buffer can hold.
    */
-  [[nodiscard]] size_t Capacity() const { return N; }
+  [[nodiscard]] static size_t Capacity() { return N; }
 
   /**
    * @brief Returns the number of chunks in the buffer center.
@@ -168,9 +168,7 @@ public:
    * @param name The name of the reference to check for.
    * @return True if a reference with the given name exists, false otherwise.
    */
-  bool HasName(const std::string &name) const {
-    return id_map_.count(name) > 0;
-  }
+  bool HasName(const std::string &name) const { return id_map_.contains(name); }
 
   /**
    * @brief Retrieves the ID associated with the given name.
@@ -179,8 +177,7 @@ public:
    * @return The ID associated with the given name.
    */
   base::ID GetID(const std::string &name) const {
-    auto it = id_map_.find(name);
-    if (it == id_map_.end()) {
+    if (const auto it = id_map_.find(name); it == id_map_.end()) {
       return -1;
     } else {
       return it->second;
@@ -244,9 +241,9 @@ public:
       : logger_(spdlog::default_logger()) {}
 
   /**
-   * @brief Initializes the context with the specified data folder.
+   * @brief Initializes the context with the specified configuration file.
    *
-   * @param data_folder The path to the data folder.
+   * @param config_path The path to the configuration file.
    * @return true if initialization succeeds, false otherwise.
    */
   bool Init(std::string_view config_path);
@@ -343,7 +340,7 @@ public:
     return ins_center_;
   }
 
-  const std::shared_ptr<spdlog::logger> Logger() const { return logger_; }
+  std::shared_ptr<spdlog::logger> Logger() const { return logger_; }
 
 private:
   std::shared_ptr<spdlog::logger> logger_;
