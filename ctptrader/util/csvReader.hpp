@@ -33,6 +33,7 @@ private:
     Read(i, t);
     ReadCell(i + 1, args...);
   }
+
   void Read(size_t i, bool &v) const { v = row_[i].get<bool>(); }
 
   void Read(size_t i, int &v) const { v = row_[i].get<int>(); }
