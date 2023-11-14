@@ -11,11 +11,16 @@ namespace ctptrader::core {
 class IFactor : public boost::noncopyable {
 
 public:
-  const base::Timestamp UpdateTime() const { return update_time_; }
-  base::Value Value() const {
+  virtual ~IFactor() = default;
+
+  [[nodiscard]] base::Timestamp UpdateTime() const { return update_time_; }
+
+  [[nodiscard]] base::Value Value() const {
     return update_time_.tv_sec == 0 && update_time_.tv_nsec == 0;
   }
+
   virtual void OnBar([[maybe_unused]] const base::Bar &bar) {}
+
   virtual void OnTick([[maybe_unused]] const base::Depth &depth) {}
 
 protected:

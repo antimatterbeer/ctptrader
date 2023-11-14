@@ -9,7 +9,7 @@ template <typename T> class Proxy {
 public:
   using Creator = T *(*)();
 
-  Proxy(std::string_view name, std::string_view libpath)
+  Proxy(const std::string_view name, const std::string_view libpath)
       : name_(name)
       , libpath_(libpath) {
     handle_ = dlopen(libpath_.c_str(), RTLD_NOW | RTLD_NODELETE);
@@ -17,7 +17,7 @@ public:
       std::cerr << "Failed to load library: " << libpath_ << std::endl;
       return;
     }
-    auto creator = (Creator)dlsym(handle_, "creator");
+    auto creator = reinterpret_cast<Creator>(dlsym(handle_, "creator"));
     if (!creator) {
       std::cerr << "Failed to load creator from library: " << libpath_
                 << std::endl;

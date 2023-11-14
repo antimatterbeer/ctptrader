@@ -15,7 +15,7 @@ template <typename T, size_t Size> class ShmSpscQueue {
       bip::allocator<T, bip::managed_shared_memory::segment_manager>;
 
 public:
-  ShmSpscQueue(std::string_view name, size_t size, bool readonly)
+  ShmSpscQueue(const std::string_view name, size_t size, bool readonly)
       : name_(name)
       , segment_(CreateSegment(name, size, readonly))
       , allocator_(segment_->get_segment_manager())
@@ -28,10 +28,9 @@ private:
     if (readonly) {
       return std::make_unique<bip::managed_shared_memory>(bip::open_only,
                                                           name.data());
-    } else {
-      return std::make_unique<bip::managed_shared_memory>(bip::open_or_create,
-                                                          name.data(), size);
     }
+    return std::make_unique<bip::managed_shared_memory>(bip::open_or_create,
+                                                        name.data(), size);
   }
 
 protected:
@@ -41,19 +40,17 @@ protected:
   QueueType *queue_;
 };
 
-template <typename T, size_t Size>
-class ShmSpscReader : private ShmSpscQueue<T, Size> {
+template <typename T, size_t Size> class ShmSpscReader : ShmSpscQueue<T, Size> {
 public:
-  explicit ShmSpscReader(std::string_view name)
+  explicit ShmSpscReader(const std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Read(T &value) { return this->queue_->pop(value); }
   [[nodiscard]] bool Empty() const { return this->queue_->empty(); }
 };
 
-template <typename T, size_t Size>
-class ShmSpscWriter : private ShmSpscQueue<T, Size> {
+template <typename T, size_t Size> class ShmSpscWriter : ShmSpscQueue<T, Size> {
 public:
-   ShmSpscWriter(std::string_view name)
+  explicit ShmSpscWriter(const std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Write(const T &value) { return this->queue_->push(value); }
   [[nodiscard]] bool Full() const { return this->queue_->full(); }

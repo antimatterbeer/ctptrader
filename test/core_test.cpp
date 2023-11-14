@@ -2,8 +2,7 @@
 
 #include <base/msg.hpp>
 #include <base/ref.hpp>
-#include <core/buf_center.hpp>
-#include <core/ref_center.hpp>
+#include <core/ctx.hpp>
 
 using namespace ctptrader;
 

@@ -73,7 +73,7 @@ protected:
   void WatchAccount(base::AccountID id) { acc_interests_[id] = 1; }
 
 private:
-  Context *ctx_;
+  Context *ctx_{};
   std::vector<int> ins_interests_;
   std::vector<int> acc_interests_;
 };
