@@ -160,7 +160,7 @@ public:
    * @param id The ID to check.
    * @return true if the ID is valid, false otherwise.
    */
-  bool HasID(base::ID id) const { return id > 0 && id < Count(); }
+  bool HasID(base::ID id) const { return id >= 0 && id < Count(); }
 
   /**
    * Checks if a reference with the given name exists in the reference center.

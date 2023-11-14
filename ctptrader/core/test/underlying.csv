@@ -1,0 +1,3 @@
+id,name,exchange,multiple,lot_size,tick_size
+0,cu,SHFE,5,5,2
+1,zn,SHFE,5,5,5

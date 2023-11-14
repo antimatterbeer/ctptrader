@@ -46,6 +46,14 @@ private:
 
   void Read(size_t i, std::string &v) const { v = row_[i].get<std::string>(); }
 
+  void Read(size_t i, base::Date &v) const {
+    v = base::Date(row_[i].get<int>());
+  }
+
+  void Read(size_t i, base::Timestamp &v) const {
+    v = base::Timestamp::FromString(row_[i].get<std::string>());
+  }
+
   void Read(size_t i, base::Exchange &v) const {
     auto s = row_[i].get<std::string>();
     auto it = base::ExchangeMap.find(s);
@@ -82,14 +90,6 @@ private:
     auto s = row_[i].get<std::string>();
     auto it = base::CurrencyMap.find(s);
     v = it == base::CurrencyMap.end() ? base::Currency_Invalid : it->second;
-  }
-
-  void Read(size_t i, base::Date &v) const {
-    v = base::Date(row_[i].get<int>());
-  }
-
-  void Read(size_t i, base::Timestamp &v) const {
-    v = base::Timestamp::FromMilliSeconds(row_[i].get<long>());
   }
 
 private:

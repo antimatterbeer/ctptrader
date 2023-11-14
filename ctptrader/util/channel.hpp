@@ -24,7 +24,7 @@ public:
 
 private:
   static std::unique_ptr<bip::managed_shared_memory>
-  CreateSegment(std::string_view name, size_t size, bool readonly) {
+  CreateSegment(const std::string_view name, size_t size, bool readonly) {
     if (readonly) {
       return std::make_unique<bip::managed_shared_memory>(bip::open_only,
                                                           name.data());
@@ -53,7 +53,6 @@ public:
   explicit ShmSpscWriter(const std::string_view name)
       : ShmSpscQueue<T, Size>(name, Size * sizeof(T) * 2, false) {}
   bool Write(const T &value) { return this->queue_->push(value); }
-  [[nodiscard]] bool Full() const { return this->queue_->full(); }
 };
 
 } // namespace ctptrader::util
