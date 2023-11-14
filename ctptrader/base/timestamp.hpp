@@ -19,16 +19,6 @@ static constexpr long NANOSINMICRO = 1000L;
 
 class Timestamp : public timespec {
 public:
-  [[nodiscard]] std::string ToString() const {
-    char buf[32];
-    struct tm t;
-    localtime_r(&tv_sec, &t);
-    sprintf(buf, "%04d%02d%02d %02d:%02d:%02d.%03ld", t.tm_year + 1900,
-            t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,
-            tv_nsec / NANOSINMILLI);
-    return buf;
-  }
-
   [[nodiscard]] std::string ToDate() const {
     char buf[32];
     struct tm t;
@@ -46,8 +36,19 @@ public:
     return buf;
   }
 
+  [[nodiscard]] std::string ToString() const {
+    char buf[32];
+    struct tm t;
+    localtime_r(&tv_sec, &t);
+    sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d.%03ld", t.tm_year + 1900,
+            t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,
+            tv_nsec / NANOSINMILLI);
+    return buf;
+  }
+
   [[nodiscard]] bool IsEmpty() const { return tv_sec == 0 && tv_nsec == 0; }
-  void clear() { tv_sec = tv_nsec = 0; }
+
+  void Clear() { tv_sec = tv_nsec = 0; }
 
   // operators
   bool operator==(const Timestamp &rhs) const {
@@ -86,7 +87,7 @@ public:
 #endif
 
   Timestamp operator+(const Timestamp &rhs) const {
-    Timestamp ts;
+    Timestamp ts{0, 0};
     ts.tv_nsec = tv_nsec + rhs.tv_nsec;
     if (ts.tv_nsec < 0) {
       ts.tv_nsec += NANOSINSECOND;

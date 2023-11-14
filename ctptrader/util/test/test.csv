@@ -1,0 +1,2 @@
+bool,int,long,float,double,string,date,timestamp,exchange,instrument_type,direction,price_type,order_status,currency
+0,1,2,3,4,5,20230101,2023-01-01 08:30:25.000,XSHG,stock,buy,limit,canceled,CNY
