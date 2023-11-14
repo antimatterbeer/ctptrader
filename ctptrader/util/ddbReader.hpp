@@ -41,7 +41,7 @@ private:
   void ReadCell(size_t idx) const {}
 
   template <typename T, typename... Types>
-  void ReadCell(size_t idx, T &t, Types &...args) const {
+  void ReadCell(size_t idx, T &t, Types &...args) {
     Get(idx, t);
     ReadCell(idx + 1, args...);
   }
