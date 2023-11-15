@@ -28,7 +28,7 @@ using Price = double;
 using Volume = int;
 
 /// @brief Large volume type
-using LargeVolume = long;
+using LargeVolume = double;
 
 /// @brief Money type
 using Money = double;
