@@ -2,11 +2,11 @@
 market_channel = "md_channel"
 data_folder = "../dat"
 broker_id = "9999"
-user_id = "218236"
-password = "simnowPW1"
+user_id = "123456"
+password = "password"
 
 [market]
-front = "180.168.146.187:10131"
+front = "180.168.146.187:10211"
 instruments = ["cu2311", "cu2312", "cu2401"]
 
 [[strategy.stg]]
