@@ -1,9 +1,8 @@
 #include <base/date.hpp>
 
 namespace ctptrader::base {
-
 inline bool IsLeapYear(int year) {
-  return (year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0));
+  return year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
 }
 
 inline int DaysInMonth(int year, int month) {
@@ -24,8 +23,7 @@ bool Date::IsValid() const {
     return false;
   }
   auto m = Month();
-  auto d = Day();
-  if (m < 1 || m > 12 || d < 1 || d > DaysInMonth(y, m)) {
+  if (auto d = Day(); m < 1 || m > 12 || d < 1 || d > DaysInMonth(y, m)) {
     return false;
   }
   return true;
@@ -53,9 +51,8 @@ Date Date::AddDays(int days) const {
 
 Date Date::Today() {
   time_t t = time(nullptr);
-  tm *local_time = localtime(&t);
+  const tm *local_time = localtime(&t);
   return Date((local_time->tm_year + 1900) * 10000 +
               (local_time->tm_mon + 1) * 100 + local_time->tm_mday);
 }
-
 } // namespace ctptrader::base

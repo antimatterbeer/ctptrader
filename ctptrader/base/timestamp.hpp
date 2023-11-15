@@ -19,6 +19,12 @@ static constexpr long NANOSINMICRO = 1000L;
 
 class Timestamp : public timespec {
 public:
+  static Timestamp Now() {
+    Timestamp ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return ts;
+  }
+
   [[nodiscard]] std::string ToDate() const {
     char buf[32];
     struct tm t;
@@ -57,8 +63,8 @@ public:
 
 #if __cplusplus >= 202002L
   std::strong_ordering operator<=>(const Timestamp &rhs) const {
-    auto cmp = tv_sec <=> rhs.tv_sec;
-    return cmp != 0 ? cmp : tv_nsec <=> rhs.tv_nsec;
+    const auto cmp = tv_sec <=> rhs.tv_sec;
+    return cmp != nullptr ? cmp : tv_nsec <=> rhs.tv_nsec;
   }
 #else
   bool operator<(const Timestamp &rhs) const {
@@ -152,10 +158,10 @@ public:
   }
 
   static Timestamp FromString(std::string_view s) {
-    struct tm tm;
+    struct tm tm {};
     memset(&tm, 0, sizeof(tm));
     strptime(s.data(), "%Y%m%d %H:%M:%S", &tm);
-    return Timestamp::FromSeconds(mktime(&tm));
+    return FromSeconds(mktime(&tm));
   }
 } __attribute__((packed));
 
@@ -167,7 +173,7 @@ public:
 
 [[maybe_unused]] static void ToLocalTime(const Timestamp &ts_,
                                          struct tm &result_) {
-  ::localtime_r(&ts_.tv_sec, &result_);
+  localtime_r(&ts_.tv_sec, &result_);
 }
 
 } // namespace ctptrader::base

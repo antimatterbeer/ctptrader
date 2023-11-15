@@ -24,8 +24,8 @@ public:
    */
   void SetContext(Context *ctx) {
     ctx_ = ctx;
-    ins_interests_.assign(ctx->InstrumentCenter().Count(), 0);
-    acc_interests_.assign(ctx->AccountCenter().Count(), 0);
+    ins_interests_.assign(ctx->GetInstrumentCenter().Count(), 0);
+    acc_interests_.assign(ctx->GetAccountCenter().Count(), 0);
   }
 
   /**
