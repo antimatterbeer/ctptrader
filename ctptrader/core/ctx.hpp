@@ -231,6 +231,36 @@ private:
   std::unordered_map<std::string, base::ID> id_map_;
 };
 
+class Clock {
+public:
+  Clock() { last_ts_ = base::Timestamp::Now(); }
+  void Init(bool sim_test) { sim_test_ = sim_test; }
+  void SetTime(const base::Timestamp &ts) { last_ts_ = ts; }
+  base::Timestamp Now() {
+    return sim_test_ ? last_ts_ : base::Timestamp::Now();
+  }
+
+private:
+  bool sim_test_{false};
+  base::Timestamp last_ts_;
+};
+
+using StaticCenter = BufCenter<base::Static, 1>;
+
+using BarCenter = BufCenter<base::Bar, 240>;
+
+using DepthCenter = BufCenter<base::Depth, 2>;
+
+using BalanceCenter = BufCenter<base::Balance, 2>;
+
+using InstrumentCenter = RefCenter<base::Instrument>;
+
+using UnderlyingCenter = RefCenter<base::Underlying>;
+
+using AccountCenter = RefCenter<base::Account>;
+
+using CalendarCenter = RefCenter<base::CalendarDate>;
+
 /**
  * @brief The Context class represents the trading context, which contains
  * various data buffers and references.
@@ -281,77 +311,72 @@ public:
    *
    * @return The static data buffer.
    */
-  const BufCenter<base::Static, 1> &StaticCenter() const { return st_center_; }
+  const StaticCenter &GetStaticCenter() const { return st_center_; }
 
   /**
    * @brief Returns the bar data buffer.
    *
    * @return The bar data buffer.
    */
-  const BufCenter<base::Bar, 240> &BarCenter() const { return bar_center_; }
+  const BarCenter &GetBarCenter() const { return bar_center_; }
 
   /**
    * @brief Returns the depth data buffer.
    *
    * @return The depth data buffer.
    */
-  const BufCenter<base::Depth, 2> &DepthCenter() const { return depth_center_; }
+  const DepthCenter &GetDepthCenter() const { return depth_center_; }
 
   /**
    * @brief Returns the balance data buffer.
    *
    * @return The balance data buffer.
    */
-  const BufCenter<base::Balance, 2> &BalanceCenter() const {
-    return bal_center_;
-  }
+  const BalanceCenter &GetBalanceCenter() const { return bal_center_; }
 
   /**
    * @brief Returns the account data reference.
    *
    * @return The account data reference.
    */
-  const RefCenter<base::Account> &AccountCenter() const { return acc_center_; }
+  const AccountCenter &GetAccountCenter() const { return acc_center_; }
 
   /**
    * @brief Returns a reference to the calendar date.
    *
    * @return The calendar date reference.
    */
-  const RefCenter<base::CalendarDate> &CalendarCenter() const {
-    return cal_center_;
-  }
+  const CalendarCenter &GetCalendarCenter() const { return cal_center_; }
 
   /**
    * @brief Returns the underlying data reference.
    *
    * @return The underlying data reference.
    */
-  const RefCenter<base::Underlying> &UnderlyingCenter() const {
-    return uly_center_;
-  }
+  const UnderlyingCenter &GetUnderlyingCenter() const { return uly_center_; }
 
   /**
    * @brief Returns the instrument data reference.
    *
    * @return The instrument data reference.
    */
-  const RefCenter<base::Instrument> &InstrumentCenter() const {
-    return ins_center_;
-  }
+  const InstrumentCenter &GetInstrumentCenter() const { return ins_center_; }
 
-  std::shared_ptr<spdlog::logger> Logger() const { return logger_; }
+  std::shared_ptr<spdlog::logger> GetLogger() const { return logger_; }
+
+  const Clock &GetClock() const { return clock_; }
 
 private:
   std::shared_ptr<spdlog::logger> logger_;
-  BufCenter<base::Static, 1> st_center_;
-  BufCenter<base::Bar, 240> bar_center_;
-  BufCenter<base::Depth, 2> depth_center_;
-  BufCenter<base::Balance, 2> bal_center_;
-  RefCenter<base::Instrument> ins_center_;
-  RefCenter<base::Underlying> uly_center_;
-  RefCenter<base::Account> acc_center_;
-  RefCenter<base::CalendarDate> cal_center_;
+  StaticCenter st_center_;
+  BarCenter bar_center_;
+  DepthCenter depth_center_;
+  BalanceCenter bal_center_;
+  InstrumentCenter ins_center_;
+  UnderlyingCenter uly_center_;
+  AccountCenter acc_center_;
+  CalendarCenter cal_center_;
+  Clock clock_;
 };
 
 } // namespace ctptrader::core

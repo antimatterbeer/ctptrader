@@ -7,8 +7,7 @@
 
 namespace ctptrader::core {
 
-template <>
-bool RefCenter<base::Account>::LoadFromCsv(std::string_view filename) {
+template <> bool AccountCenter::LoadFromCsv(std::string_view filename) {
   util::CsvReader<3> reader(filename);
   base::Account account;
   while (reader.ReadRow(account.id_, account.name_, account.alias_)) {
@@ -22,8 +21,7 @@ bool RefCenter<base::Account>::LoadFromCsv(std::string_view filename) {
   return true;
 }
 
-template <>
-bool RefCenter<base::Underlying>::LoadFromCsv(std::string_view filename) {
+template <> bool UnderlyingCenter::LoadFromCsv(std::string_view filename) {
   util::CsvReader<6> reader(filename);
   base::Underlying u;
   while (reader.ReadRow(u.id_, u.name_, u.exchange_, u.multiple_, u.lot_size_,
@@ -38,8 +36,7 @@ bool RefCenter<base::Underlying>::LoadFromCsv(std::string_view filename) {
   return true;
 }
 
-template <>
-bool RefCenter<base::Instrument>::LoadFromCsv(std::string_view filename) {
+template <> bool InstrumentCenter::LoadFromCsv(std::string_view filename) {
   util::CsvReader<8> reader(filename);
   base::Instrument i;
   while (reader.ReadRow(i.id_, i.name_, i.underlying_, i.type_, i.create_date_,
@@ -55,8 +52,7 @@ bool RefCenter<base::Instrument>::LoadFromCsv(std::string_view filename) {
   return true;
 }
 
-template <>
-bool RefCenter<base::CalendarDate>::LoadFromCsv(std::string_view filename) {
+template <> bool CalendarCenter::LoadFromCsv(std::string_view filename) {
   util::CsvReader<5> reader(filename);
   struct Row {
     base::DateID id_;

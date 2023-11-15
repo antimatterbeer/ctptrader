@@ -19,6 +19,12 @@ static constexpr long NANOSINMICRO = 1000L;
 
 class Timestamp : public timespec {
 public:
+  static Timestamp Now() {
+    Timestamp ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return ts;
+  }
+
   [[nodiscard]] std::string ToDate() const {
     char buf[32];
     struct tm t;

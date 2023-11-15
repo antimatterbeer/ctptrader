@@ -13,7 +13,7 @@ public:
     for (auto &i : *config["instruments"].as_array()) {
       auto inst = i.value<std::string>();
       if (inst.has_value()) {
-        auto inst_id = GetContext()->InstrumentCenter().GetID(inst.value());
+        auto inst_id = GetContext()->GetInstrumentCenter().GetID(inst.value());
         if (inst_id > 0) {
           WatchInstrument(inst_id);
         }
@@ -22,7 +22,7 @@ public:
     for (auto &a : *config["accounts"].as_array()) {
       auto acc = a.value<std::string>();
       if (acc.has_value()) {
-        auto acc_id = GetContext()->AccountCenter().GetID(acc.value());
+        auto acc_id = GetContext()->GetAccountCenter().GetID(acc.value());
         if (acc_id > 0) {
           WatchAccount(acc_id);
         }
@@ -31,19 +31,19 @@ public:
   }
 
   void OnStatic(const base::Static &st) override {
-    GetContext()->Logger()->info("On static. Instrument: {}", st.id_);
+    GetContext()->GetLogger()->info("On static. Instrument: {}", st.id_);
   }
 
   void OnDepth(const base::Depth &depth) override {
-    GetContext()->Logger()->info("On depth. Instrument: {}", depth.id_);
+    GetContext()->GetLogger()->info("On depth. Instrument: {}", depth.id_);
   }
 
   void OnBar(const base::Bar &bar) override {
-    GetContext()->Logger()->info("On bar. Instrument: {}", bar.id_);
+    GetContext()->GetLogger()->info("On bar. Instrument: {}", bar.id_);
   }
 
   void OnBalance(const base::Balance &bal) override {
-    GetContext()->Logger()->info("On balance. Account: {}", bal.id_);
+    GetContext()->GetLogger()->info("On balance. Account: {}", bal.id_);
   }
 };
 
