@@ -47,4 +47,27 @@ TEST(ShmSpscQueueTest, Empty) {
   }
   ASSERT_FALSE(reader.Empty());
 }
+
+TEST(ShmReaderWriterTest, ReadWrite) {
+  constexpr size_t kQueueSize = 1024;
+  constexpr size_t kNumMessages = 1000;
+  constexpr char kQueueName[] = "test_queue";
+
+  // Create writer process
+  ShmWriter<int, kQueueSize> writer(kQueueName);
+  for (size_t i = 0; i < kNumMessages; ++i) {
+    ASSERT_TRUE(writer.Write(i));
+  }
+
+  // Create reader process
+  ShmReader<int, kQueueSize> reader(kQueueName);
+  for (size_t i = 0; i < kNumMessages; ++i) {
+    int value;
+    while (!reader.Read(value)) {
+      std::this_thread::yield();
+    }
+    ASSERT_EQ(value, i);
+  }
+}
+
 } // namespace
