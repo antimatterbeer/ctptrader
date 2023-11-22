@@ -4,11 +4,20 @@
 #include <string_view>
 
 #include <boost/circular_buffer.hpp>
-#include <spdlog/spdlog.h>
-#include <toml.hpp>
+#include <loguru.hpp>
 
 #include <base/msg.hpp>
 #include <base/ref.hpp>
+#include <core/toml.hpp>
+
+namespace ctptrader {
+#include <loguru.hpp>
+
+#define LOG_INFO(...) LOG_F(INFO, __VA_ARGS__)
+#define LOG_WARNING(...) LOG_F(WARNING, __VA_ARGS__)
+#define LOG_ERROR(...) LOG_F(ERROR, __VA_ARGS__)
+
+} // namespace ctptrader
 
 namespace ctptrader::core {
 
@@ -267,9 +276,6 @@ using CalendarCenter = RefCenter<base::CalendarDate>;
  */
 class Context {
 public:
-  Context()
-      : logger_(spdlog::default_logger()) {}
-
   /**
    * @brief Initializes the context with the specified configuration file.
    *
@@ -362,12 +368,9 @@ public:
    */
   const InstrumentCenter &GetInstrumentCenter() const { return ins_center_; }
 
-  std::shared_ptr<spdlog::logger> GetLogger() const { return logger_; }
-
   const Clock &GetClock() const { return clock_; }
 
 private:
-  std::shared_ptr<spdlog::logger> logger_;
   StaticCenter st_center_;
   BarCenter bar_center_;
   DepthCenter depth_center_;

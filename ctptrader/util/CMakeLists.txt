@@ -4,7 +4,6 @@ add_library(${LIB_NAME} STATIC
     channel.cpp
     proxy.cpp
     csvReader.cpp
-    ddbReader.cpp
 )
 
 add_executable(${LIB_NAME}_test

@@ -1,7 +1,5 @@
 #include <string_view>
 
-#include <toml.hpp>
-
 #include <app/market.hpp>
 #include <app/strategy.hpp>
 

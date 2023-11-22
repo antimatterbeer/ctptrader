@@ -17,7 +17,7 @@ bool StrategyManager::Init(toml::table &global_config,
       stgs_.emplace_back(name.value(), libpath.value());
       stgs_.back().Instance().SetContext(&ctx_);
       stgs_.back().Instance().Init(stg_config);
-      ctx_.GetLogger()->info("Loaded strategy: {}", name.value());
+      LOG_INFO("Loaded strategy: %s", name.value().c_str());
     }
   }
   return true;
